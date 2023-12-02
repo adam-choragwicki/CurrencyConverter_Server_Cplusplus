@@ -1,0 +1,10 @@
+.idea
+bin/
+out/
+*.iml
+*.class
+*.MF
+*cmake-build*
+CurrencyConverter_Server*
+CurrencyConverter_ServerTest_run
+__pycache__
