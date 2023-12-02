@@ -1,0 +1,61 @@
+name: Tests pipeline
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Pipeline started"
+
+      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "The branch name is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 Repository ${{ github.repository }}, branch name ${{ github.ref }}, has been cloned to the runner."
+
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies"
+          sudo apt-get update && sudo apt-get install -y cmake g++ libcurl4-openssl-dev
+
+      - name: Configure CMake
+        run: |
+          echo "Configuring CMake"
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: |
+          echo "Building project"
+          cmake --build build --config ${{env.BUILD_TYPE}}
+
+      - name: Start Currency Converter server
+        run: |
+          echo "Starting Currency Converter server"
+          ./bin/CurrencyConverter_Server &
+          SERVER_PID=$!
+
+      - name: Run test scripts
+        run: |
+          echo "Running Python tests"
+          python3 tests/scripts/run_test.py
+          EXIT_CODE=$?
+          echo "Exit code: $EXIT_CODE"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Test scripts failed with exit code $EXIT_CODE"
+            exit 1
+          fi
+
+      - run: echo "Pipeline finished"
