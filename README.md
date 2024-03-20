@@ -4,6 +4,8 @@ This repository contains the server part of my currency converter, written in C+
 
 **Linux executable scripts are provided.**
 
+![](screenshot.png)
+
 Source code for the client is available in:
 
 https://github.com/adam-choragwicki/CurrencyConverter_Client_JavaSwing
@@ -46,8 +48,15 @@ The currency converter consists of server and client.
 
 * Java RE (minimum version 8)
 
-# How to run
+# How to run (Linux only)
+1. Clone repository and run **start_currency_converter.sh**
 
-1. Download the latest release
-2. Unzip
-3. Run **start_currency_converter_server.sh**
+**OR**
+
+1. Download server release zip from:\
+   https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/releases/latest/download/executable_linux.zip
+2. Download client release zip from:\
+   https://github.com/adam-choragwicki/CurrencyConverter_Client_JavaSwing/releases/latest/download/release.zip
+3. Unzip both archives
+4. Run **executable_linux/start_currency_converter_server.sh**
+5. Run **release/start_currency_converter_client.sh**
