@@ -4,6 +4,7 @@
 #include "types/exchange_rate.h"
 #include "types/timestamp.h"
 #include "types/currency_exchange_rates_json.h"
+#include "types/definitions.h"
 #include <map>
 #include <set>
 
@@ -32,16 +33,16 @@ public:
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
     { return currenciesCodes_; }
 
-    void setCache(const std::map<CurrencyCode, CurrencyExchangeRatesJson>& currenciesCodesToExchangeRatesJsonsMapping);
+    void setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping);
 
 private:
     void loadCacheFromFiles();
-    void loadCacheFromMap(const std::map<CurrencyCode, CurrencyExchangeRatesJson>& currenciesCodesToExchangeRatesJsons);
+    void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
     const std::string currenciesFileContent_;
     Timestamp currenciesExchangeRatesTimestamp_;
     std::set<CurrencyCode> currenciesCodes_;
-    std::map<CurrencyCode, std::map<CurrencyCode, ExchangeRate>> currenciesRatesCache_;
+    CurrenciesRatesCache currenciesRatesCache_;
 
     bool alreadyCreated_{};
 };

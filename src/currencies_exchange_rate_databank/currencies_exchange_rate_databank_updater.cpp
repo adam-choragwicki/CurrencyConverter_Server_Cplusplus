@@ -3,6 +3,7 @@
 #include "downloader/download_manager.h"
 #include "json_processing/json_parser.h"
 #include "spdlog/spdlog.h"
+#include "types/definitions.h"
 
 bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
@@ -10,7 +11,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     Timer timer;
 
-    std::map<CurrencyCode, CurrencyExchangeRatesJson> currenciesCodesToExchangeRatesJsonsMapping;
+    CurrencyCodeToCurrencyExchangeRatesJsonMapping currenciesCodesToExchangeRatesJsonsMapping;
 
     try
     {
@@ -34,7 +35,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
     return true;
 }
 
-void CurrenciesExchangeRateDatabankUpdater::updateCache(const std::map<CurrencyCode, CurrencyExchangeRatesJson>& currenciesCodesToExchangeRatesJsonsMapping, const Timestamp& exchangeRatesTimestamp, CurrenciesExchangeRateDatabank& currenciesDatabank)
+void CurrenciesExchangeRateDatabankUpdater::updateCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping, const Timestamp& exchangeRatesTimestamp, CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
     currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
     currenciesDatabank.setExchangeRatesTimestamp(exchangeRatesTimestamp);

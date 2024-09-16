@@ -16,7 +16,7 @@ set(TEST_SOURCES
         currency_code_test.cpp
         currencies_exchange_rate_databank_test.cpp
         client_socket_handler_test.cpp
-        request_parser_test.cpp)
+        request_parser_test.cpp downloader_test.cpp)
 
 add_subdirectory(libs/googletest)
 

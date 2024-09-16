@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utilities.h"
+#include "types/definitions.h"
 #include <set>
 #include <map>
 
@@ -17,7 +18,7 @@ public:
 class CurlManager
 {
 public:
-    static std::map<CurrencyCode, CurrencyExchangeRatesJson> downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
+    static CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
     static std::map<CurrencyCode, CurlEasyHandle> setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);

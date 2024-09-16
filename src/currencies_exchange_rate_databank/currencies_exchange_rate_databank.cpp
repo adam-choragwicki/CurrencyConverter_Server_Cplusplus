@@ -3,6 +3,7 @@
 #include "utilities/file_loader.h"
 #include "config.h"
 #include "spdlog/spdlog.h"
+#include "types/definitions.h"
 
 CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFileContent_(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH))
 {
@@ -21,7 +22,7 @@ void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
 {
     spdlog::debug("Loading currencies exchange rates from files");
 
-    std::map<CurrencyCode, std::map<CurrencyCode, ExchangeRate>> currenciesRatesCache;
+    CurrenciesRatesCache currenciesRatesCache;
 
     currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"), CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
 
@@ -38,11 +39,11 @@ void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
     spdlog::debug("Loading currencies exchange rates from files... DONE");
 }
 
-void CurrenciesExchangeRateDatabank::loadCacheFromMap(const std::map<CurrencyCode, CurrencyExchangeRatesJson>& currenciesCodesToExchangeRatesJsons)
+void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons)
 {
     spdlog::info("Loading currencies exchange rates from map");
 
-    std::map<CurrencyCode, std::map<CurrencyCode, ExchangeRate>> currenciesRatesCache;
+    CurrenciesRatesCache currenciesRatesCache;
 
     for(const CurrencyCode& currencyCode : currenciesCodes_)
     {
@@ -73,7 +74,7 @@ ExchangeRate CurrenciesExchangeRateDatabank::getExchangeRate(const CurrencyCode&
     return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
 }
 
-void CurrenciesExchangeRateDatabank::setCache(const std::map<CurrencyCode, CurrencyExchangeRatesJson>& currenciesCodesToExchangeRatesJsonsMapping)
+void CurrenciesExchangeRateDatabank::setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping)
 {
     loadCacheFromMap(currenciesCodesToExchangeRatesJsonsMapping);
 }

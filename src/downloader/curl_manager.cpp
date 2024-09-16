@@ -2,8 +2,9 @@
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
 #include "spdlog/spdlog.h"
+#include "types/definitions.h"
 
-std::map<CurrencyCode, CurrencyExchangeRatesJson> CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
+CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
 {
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
@@ -18,7 +19,7 @@ std::map<CurrencyCode, CurrencyExchangeRatesJson> CurlManager::downloadMultiplex
         curl_multi_remove_handle(curlMultiHandle.get(), handle.get());
     }
 
-    std::map<CurrencyCode, CurrencyExchangeRatesJson> currencyCodeToCurrencyExchangeRatesJsonMapping;
+    CurrencyCodeToCurrencyExchangeRatesJsonMapping currencyCodeToCurrencyExchangeRatesJsonMapping;
 
     for(const auto&[currencyCode, currencyExchangeRatesJson] : responsesContents)
     {

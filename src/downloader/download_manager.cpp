@@ -1,6 +1,5 @@
 #include "download_manager.h"
 #include "types/currency_code.h"
-#include "types/currency_exchange_rates_json.h"
 #include "curl_manager.h"
 #include "curl/curl.h"
 
@@ -20,7 +19,7 @@ DownloadManager& DownloadManager::getInstance()
     return downloadManager;
 }
 
-std::map<CurrencyCode, CurrencyExchangeRatesJson> DownloadManager::downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes)
+CurrencyCodeToCurrencyExchangeRatesJsonMapping DownloadManager::downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes)
 {
     try
     {

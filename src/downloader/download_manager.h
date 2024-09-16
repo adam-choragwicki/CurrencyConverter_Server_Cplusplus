@@ -1,5 +1,6 @@
 #pragma once
 
+#include "types/definitions.h"
 #include <set>
 #include <map>
 #include <stdexcept>
@@ -18,7 +19,7 @@ class DownloadManager
 {
 public:
     static DownloadManager& getInstance();
-    std::map<CurrencyCode, CurrencyExchangeRatesJson> downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes);
+    CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
     DownloadManager();
