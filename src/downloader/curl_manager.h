@@ -1,10 +1,11 @@
 #pragma once
 
-#include "types/currency_code.h"
 #include "utilities.h"
-#include "types/currency_exchange_rates_json.h"
 #include <set>
 #include <map>
+
+class CurrencyCode;
+class CurrencyExchangeRatesJson;
 
 class CurlError : public std::runtime_error
 {
@@ -13,7 +14,7 @@ public:
     {}
 };
 
-class Downloader
+class CurlManager
 {
 public:
     static std::map<CurrencyCode, CurrencyExchangeRatesJson> downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);

@@ -1,5 +1,9 @@
 #include "json_parser.h"
 #include "json_reader.h"
+#include "types/currency_code.h"
+#include "types/exchange_rate.h"
+#include "types/timestamp.h"
+#include "types/currency_exchange_rates_json.h"
 #include "spdlog/spdlog.h"
 
 std::set<CurrencyCode> JsonParser::parseJsonToCurrenciesCodes(const std::string& string)
@@ -18,7 +22,9 @@ std::set<CurrencyCode> JsonParser::parseJsonToCurrenciesCodes(const std::string&
     return currenciesCodes;
 }
 
-std::map<CurrencyCode, ExchangeRate> JsonParser::extractAllExchangeRatesFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode, const std::set<CurrencyCode>& currenciesCodes, const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
+std::map<CurrencyCode, ExchangeRate> JsonParser::extractAllExchangeRatesFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
+                                                                                                            const std::set<CurrencyCode>& currenciesCodes,
+                                                                                                            const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 

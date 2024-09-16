@@ -1,6 +1,6 @@
 set(SOURCE_FILES
         download_manager.cpp download_manager.h
-        downloader.cpp downloader.h
+        curl_manager.cpp curl_manager.h
         utilities.cpp utilities.h)
 
 add_library(downloader ${SOURCE_FILES})

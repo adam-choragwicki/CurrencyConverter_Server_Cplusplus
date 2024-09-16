@@ -1,10 +1,11 @@
 #pragma once
 
-#include "types/currency_code.h"
-#include "types/currency_exchange_rates_json.h"
 #include <set>
 #include <map>
 #include <stdexcept>
+
+class CurrencyCode;
+class CurrencyExchangeRatesJson;
 
 class DownloadError : public std::runtime_error
 {

@@ -1,7 +1,9 @@
-#include "downloader.h"
+#include "curl_manager.h"
+#include "types/currency_code.h"
+#include "types/currency_exchange_rates_json.h"
 #include "spdlog/spdlog.h"
 
-std::map<CurrencyCode, CurrencyExchangeRatesJson> Downloader::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
+std::map<CurrencyCode, CurrencyExchangeRatesJson> CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
 {
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
@@ -33,7 +35,7 @@ std::map<CurrencyCode, CurrencyExchangeRatesJson> Downloader::downloadMultiplexi
     return currencyCodeToCurrencyExchangeRatesJsonMapping;
 }
 
-std::map<CurrencyCode, CurlEasyHandle> Downloader::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
+std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
 {
     std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping;
 
@@ -70,7 +72,7 @@ std::map<CurrencyCode, CurlEasyHandle> Downloader::setupDownload(const CurlMulti
     return currencyCodesToHandlesMapping;
 }
 
-void Downloader::startDownload(CURLM* multiHandle)
+void CurlManager::startDownload(CURLM* multiHandle)
 {
     spdlog::info("Starting downloads");
 
@@ -118,7 +120,7 @@ void Downloader::startDownload(CURLM* multiHandle)
     spdlog::info("Finished downloads");
 }
 
-void Downloader::handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping)
+void CurlManager::handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping)
 {
     for(const auto&[currencyCode, handle] : currencyCodesToHandlesMapping)
     {

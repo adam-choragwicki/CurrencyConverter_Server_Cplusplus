@@ -1,5 +1,7 @@
 #include "download_manager.h"
-#include "downloader.h"
+#include "types/currency_code.h"
+#include "types/currency_exchange_rates_json.h"
+#include "curl_manager.h"
 #include "curl/curl.h"
 
 DownloadManager::DownloadManager()
@@ -22,7 +24,7 @@ std::map<CurrencyCode, CurrencyExchangeRatesJson> DownloadManager::downloadCurre
 {
     try
     {
-        return Downloader::downloadMultiplexing(currenciesCodes);
+        return CurlManager::downloadMultiplexing(currenciesCodes);
     }
     catch(const CurlError& exception)
     {
