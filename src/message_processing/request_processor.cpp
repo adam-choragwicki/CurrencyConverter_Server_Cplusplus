@@ -70,19 +70,16 @@ UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& u
     bool updateSuccessful = CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(currenciesDatabank);
 
     std::string status;
-//    Timestamp exchangeRatesTimestamp;
 
     const CorrelationId& correlationId = updateCacheRequest.getCorrelationId();
 
     if(updateSuccessful)
     {
         status = MessageContract::MessageContent::UpdateCacheResponseContract::OK_STATUS;
-//        exchangeRatesTimestamp = currenciesDatabank.getCurrenciesExchangeRateTimestamp();
     }
     else
     {
         status = MessageContract::MessageContent::UpdateCacheResponseContract::FAIL_STATUS;
-//        exchangeRatesTimestamp = Timestamp(MessageContract::MessageContent::NONE);
     }
 
     auto updateCacheResponse = ResponseFactory::makeUpdateCacheResponse(status, correlationId);

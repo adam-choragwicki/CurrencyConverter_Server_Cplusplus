@@ -36,7 +36,6 @@ UpdateCacheResponse ResponseFactory::makeUpdateCacheResponse(const std::string& 
     assignCorrelationId(jsonWriter, correlationId);
 
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::STATUS, status);
-//    jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::NEW_EXCHANGE_RATES_TIMESTAMP, newExchangeRatesTimestamp.toString());
 
     return {MessageContract::MessageType::ResponseType::UPDATE_CACHE_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
 }

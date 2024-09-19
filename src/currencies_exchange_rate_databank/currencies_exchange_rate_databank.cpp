@@ -59,11 +59,6 @@ void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
 
     CurrenciesRatesCache currenciesRatesCache;
 
-//    currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"),
-//                                                                   CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
-//
-//    spdlog::debug("Exchange rates timestamp: " + currenciesExchangeRatesTimestamp_.toString());
-
     for(const CurrencyCode& currencyCode : currenciesCodes_)
     {
         const CurrencyExchangeRatesJson currencyExchangeRatesJson = loadFileForCurrency(currencyCode);
