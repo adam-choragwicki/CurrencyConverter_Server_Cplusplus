@@ -1,10 +1,8 @@
 #pragma once
 
-#include "types/currency_code.h"
-#include "currencies_exchange_rate_databank.h"
-#include "types/currency_exchange_rates_json.h"
-#include <map>
+#include "types/definitions.h"
 
+class CurrenciesExchangeRateDatabank;
 class DownloadManager;
 
 class CurrenciesExchangeRateDatabankUpdater
