@@ -1,20 +1,19 @@
 #include "response_factory.h"
 #include "messages/message_contract.h"
 
-GetConfigResponse ResponseFactory::makeGetConfigResponse(const Timestamp& exchangeRatesTimestamp, const std::string& currenciesNamesAndCodes, const CorrelationId& correlationId)
+GetConfigResponse ResponseFactory::makeGetConfigResponse(const std::string& currenciesNamesAndCodes, const CorrelationId& correlationId)
 {
     JsonWriter jsonWriter;
 
     assignResponseType(jsonWriter, MessageContract::MessageType::ResponseType::GET_CONFIG_RESPONSE);
     assignCorrelationId(jsonWriter, correlationId);
 
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::GetConfigResponseContract::EXCHANGE_RATES_TIMESTAMP, exchangeRatesTimestamp.toString());
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::GetConfigResponseContract::CURRENCIES_NAMES_AND_CODES, currenciesNamesAndCodes);
 
     return {MessageContract::MessageType::ResponseType::GET_CONFIG_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
 }
 
-CalculateExchangeResponse ResponseFactory::makeCalculateExchangeResponse(const std::string& status, const std::string& calculationResult, const std::string& failureReason, const CorrelationId& correlationId)
+CalculateExchangeResponse ResponseFactory::makeCalculateExchangeResponse(const std::string& status, const std::string& calculationResult, const Timestamp& exchangeRateTimestamp, const std::string& failureReason, const CorrelationId& correlationId)
 {
     JsonWriter jsonWriter;
 
@@ -23,12 +22,13 @@ CalculateExchangeResponse ResponseFactory::makeCalculateExchangeResponse(const s
 
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::STATUS, status);
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::CALCULATION_RESULT, calculationResult);
+    jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::EXCHANGE_RATE_TIMESTAMP, exchangeRateTimestamp.toString());
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::FAILURE_REASON, failureReason);
 
     return {MessageContract::MessageType::ResponseType::CALCULATE_EXCHANGE_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
 }
 
-UpdateCacheResponse ResponseFactory::makeUpdateCacheResponse(const std::string& status, const Timestamp& newExchangeRatesTimestamp, const CorrelationId& correlationId)
+UpdateCacheResponse ResponseFactory::makeUpdateCacheResponse(const std::string& status, const CorrelationId& correlationId)
 {
     JsonWriter jsonWriter;
 
@@ -36,7 +36,7 @@ UpdateCacheResponse ResponseFactory::makeUpdateCacheResponse(const std::string& 
     assignCorrelationId(jsonWriter, correlationId);
 
     jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::STATUS, status);
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::NEW_EXCHANGE_RATES_TIMESTAMP, newExchangeRatesTimestamp.toString());
+//    jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::NEW_EXCHANGE_RATES_TIMESTAMP, newExchangeRatesTimestamp.toString());
 
     return {MessageContract::MessageType::ResponseType::UPDATE_CACHE_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
 }

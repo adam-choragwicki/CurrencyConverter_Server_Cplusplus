@@ -7,11 +7,10 @@
 
 GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
-    const Timestamp& currenciesExchangeRateTimestamp = currenciesDatabank.getCurrenciesExchangeRateTimestamp();
     const std::string& currenciesListFileContent = currenciesDatabank.getCurrenciesListFileContent();
     const CorrelationId& correlationId = getConfigRequest.getCorrelationId();
 
-    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesExchangeRateTimestamp, currenciesListFileContent, correlationId);
+    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesListFileContent, correlationId);
     return getConfigResponse;
 }
 
@@ -25,13 +24,18 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
     std::string status;
     std::string calculationResult;
     std::string failureReason;
+    Timestamp currenciesExchangeRateTimestamp;
 
     if(ValidationResult validationResult = CalculateExchangeRequestValidator::validateRequest(calculateExchangeRequest); validationResult.isValid())
     {
-        if(currenciesDatabank.containsExchangeRate(sourceCurrencyCode, targetCurrencyCode))
+        if(currenciesDatabank.containsExchangeRateData(sourceCurrencyCode, targetCurrencyCode))
         {
             status = MessageContract::MessageContent::CalculateExchangeResponseContract::OK_STATUS;
-            calculationResult = Converter::convert(moneyAmount, currenciesDatabank.getExchangeRateForCurrenciesPair(sourceCurrencyCode, targetCurrencyCode));
+
+            const ExchangeRateData exchangeRateData = currenciesDatabank.getExchangeRateDataForCurrenciesPair(sourceCurrencyCode, targetCurrencyCode);
+
+            calculationResult = Converter::convert(moneyAmount, exchangeRateData.getExchangeRate());
+            currenciesExchangeRateTimestamp = exchangeRateData.getTimestamp();
             failureReason = MessageContract::MessageContent::NONE;
         }
         else
@@ -57,7 +61,7 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
         spdlog::error(failureReason);
     }
 
-    auto calculateExchangeResponse = ResponseFactory::makeCalculateExchangeResponse(status, calculationResult, failureReason, correlationId);
+    auto calculateExchangeResponse = ResponseFactory::makeCalculateExchangeResponse(status, calculationResult, currenciesExchangeRateTimestamp, failureReason, correlationId);
     return calculateExchangeResponse;
 }
 
@@ -66,21 +70,21 @@ UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& u
     bool updateSuccessful = CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(currenciesDatabank);
 
     std::string status;
-    Timestamp exchangeRatesTimestamp;
+//    Timestamp exchangeRatesTimestamp;
 
     const CorrelationId& correlationId = updateCacheRequest.getCorrelationId();
 
     if(updateSuccessful)
     {
         status = MessageContract::MessageContent::UpdateCacheResponseContract::OK_STATUS;
-        exchangeRatesTimestamp = currenciesDatabank.getCurrenciesExchangeRateTimestamp();
+//        exchangeRatesTimestamp = currenciesDatabank.getCurrenciesExchangeRateTimestamp();
     }
     else
     {
         status = MessageContract::MessageContent::UpdateCacheResponseContract::FAIL_STATUS;
-        exchangeRatesTimestamp = Timestamp(MessageContract::MessageContent::NONE);
+//        exchangeRatesTimestamp = Timestamp(MessageContract::MessageContent::NONE);
     }
 
-    auto updateCacheResponse = ResponseFactory::makeUpdateCacheResponse(status, exchangeRatesTimestamp, correlationId);
+    auto updateCacheResponse = ResponseFactory::makeUpdateCacheResponse(status, correlationId);
     return updateCacheResponse;
 }

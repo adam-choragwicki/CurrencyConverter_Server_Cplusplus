@@ -15,6 +15,7 @@ public:
     [[nodiscard]] const Timestamp& getTimestamp() const
     { return timestamp_; }
 
+private:
     ExchangeRate exchangeRate_;
     Timestamp timestamp_;
 };

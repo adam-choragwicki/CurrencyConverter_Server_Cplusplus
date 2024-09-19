@@ -5,7 +5,6 @@
 #include "spdlog/spdlog.h"
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
-#include "types/exchange_rate.h"
 #include "json_processing/exceptions.h"
 
 CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesListFileContent_(loadCurrenciesListFileContent())
@@ -101,14 +100,14 @@ void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurren
     spdlog::info("Loading currencies exchange rates from map... DONE");
 }
 
-bool CurrenciesExchangeRateDatabank::containsExchangeRate(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
     return currenciesRatesCache_.contains(sourceCurrencyCode) && currenciesRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
 }
 
-ExchangeRate CurrenciesExchangeRateDatabank::getExchangeRateForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+ExchangeRateData CurrenciesExchangeRateDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
-    return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode).getExchangeRate();
+    return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
 }
 
 void CurrenciesExchangeRateDatabank::setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping)

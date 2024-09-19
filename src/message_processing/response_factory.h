@@ -9,9 +9,9 @@
 class ResponseFactory
 {
 public:
-    static GetConfigResponse makeGetConfigResponse(const Timestamp& exchangeRatesTimestamp, const std::string& currenciesNamesAndCodes, const CorrelationId& correlationId);
-    static CalculateExchangeResponse makeCalculateExchangeResponse(const std::string& status, const std::string& calculationResult, const std::string& failureReason, const CorrelationId& correlationId);
-    static UpdateCacheResponse makeUpdateCacheResponse(const std::string& status, const Timestamp& newExchangeRatesTimestamp, const CorrelationId& correlationId);
+    static GetConfigResponse makeGetConfigResponse(const std::string& currenciesNamesAndCodes, const CorrelationId& correlationId);
+    static CalculateExchangeResponse makeCalculateExchangeResponse(const std::string& status, const std::string& calculationResult, const Timestamp& exchangeRateTimestamp, const std::string& failureReason, const CorrelationId& correlationId);
+    static UpdateCacheResponse makeUpdateCacheResponse(const std::string& status, const CorrelationId& correlationId);
 
 private:
     static void assignResponseType(JsonWriter& jsonWriter, const std::string& type);

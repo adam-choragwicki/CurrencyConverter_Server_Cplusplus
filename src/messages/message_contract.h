@@ -32,7 +32,6 @@ namespace MessageContract
 
         namespace GetConfigResponseContract
         {
-            const std::string EXCHANGE_RATES_TIMESTAMP = "exchange_rates_timestamp";
             const std::string CURRENCIES_NAMES_AND_CODES = "currencies_names_and_codes";
         }
 
@@ -47,6 +46,7 @@ namespace MessageContract
         {
             const std::string STATUS = "status";
             const std::string CALCULATION_RESULT = "calculation_result";
+            const std::string EXCHANGE_RATE_TIMESTAMP = "exchange_rate_timestamp";
             const std::string FAILURE_REASON = "failure_reason";
 
             const std::string OK_STATUS = "OK";
@@ -56,7 +56,6 @@ namespace MessageContract
         namespace UpdateCacheResponseContract
         {
             const std::string STATUS = "status";
-            const std::string NEW_EXCHANGE_RATES_TIMESTAMP = "new_exchange_rates_timestamp";
 
             const std::string OK_STATUS = "OK";
             const std::string FAIL_STATUS = "FAIL";

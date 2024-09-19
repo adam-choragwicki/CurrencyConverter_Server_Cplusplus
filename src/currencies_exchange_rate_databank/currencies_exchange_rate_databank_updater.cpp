@@ -56,5 +56,5 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 void CurrenciesExchangeRateDatabankUpdater::updateCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping, const Timestamp& exchangeRatesTimestamp, CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
     currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
-    currenciesDatabank.setExchangeRatesTimestamp(exchangeRatesTimestamp);
+//    currenciesDatabank.setExchangeRatesTimestamp(exchangeRatesTimestamp);
 }

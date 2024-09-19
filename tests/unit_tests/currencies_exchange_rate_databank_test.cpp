@@ -28,7 +28,7 @@ TEST_F(CurrenciesDatabankTest, AllCombinationsOfExchangeRatesArePresent)
         {
             if(sourceCurrencyCode != targetCurrencyCode)
             {
-                EXPECT_TRUE(currenciesDatabank_.containsExchangeRate(sourceCurrencyCode, targetCurrencyCode));
+                EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(sourceCurrencyCode, targetCurrencyCode));
             }
         }
     }

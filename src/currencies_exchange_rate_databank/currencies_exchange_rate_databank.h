@@ -1,6 +1,5 @@
 #pragma once
 
-#include "types/timestamp.h"
 #include "types/definitions.h"
 #include "types/currency_code.h"
 #include <set>
@@ -15,20 +14,8 @@ public:
     CurrenciesExchangeRateDatabank& operator=(const CurrenciesExchangeRateDatabank&) = delete;
     CurrenciesExchangeRateDatabank& operator=(CurrenciesExchangeRateDatabank&&) = delete;
 
-    [[nodiscard]] bool containsExchangeRate(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
-    [[nodiscard]] ExchangeRate getExchangeRateForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
-
-    //    [[nodiscard]] const Timestamp& getCurrenciesExchangeRateTimestamp() const
-    //    { return currenciesExchangeRatesTimestamp_; }
-    //
-    //    void setExchangeRatesTimestamp(const Timestamp& currenciesExchangeRatesTimestamp)
-    //    { currenciesExchangeRatesTimestamp_ = currenciesExchangeRatesTimestamp; }
-
-    [[nodiscard]] const Timestamp& getCurrenciesExchangeRateTimestamp() const
-    { return *(new Timestamp("0"));}
-
-    void setExchangeRatesTimestamp(const Timestamp& currenciesExchangeRatesTimestamp)
-    { currenciesExchangeRatesTimestamp_ = currenciesExchangeRatesTimestamp; }
+    [[nodiscard]] bool containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
+    [[nodiscard]] ExchangeRateData getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
 
     [[nodiscard]] const std::string& getCurrenciesListFileContent() const
     { return currenciesListFileContent_; }
@@ -45,7 +32,6 @@ private:
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
     const std::string currenciesListFileContent_;
-    Timestamp currenciesExchangeRatesTimestamp_;
     std::set<CurrencyCode> currenciesCodes_;
     CurrenciesRatesCache currenciesRatesCache_;
 
