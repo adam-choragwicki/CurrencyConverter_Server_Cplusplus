@@ -3,6 +3,11 @@
 #include "message_processing/exceptions.h"
 #include "message_processing/request_parser.h"
 #include "message_processing/request_processor.h"
+
+#include "messages/responses/get_config_response.h"
+#include "messages/responses/calculate_exchange_response.h"
+#include "messages/responses/update_cache_response.h"
+
 #include "config/config_loader.h"
 #include "spdlog/spdlog.h"
 #include <iostream>

@@ -1,14 +1,15 @@
 #pragma once
 
-#include "messages/requests/get_config_request.h"
-#include "messages/requests/calculate_exchange_request.h"
-#include "messages/requests/update_cache_request.h"
-#include "messages/responses/get_config_response.h"
-#include "messages/responses/calculate_exchange_response.h"
-#include "messages/responses/update_cache_response.h"
-#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
-
+class CurrenciesExchangeRateDatabank;
 class DownloadManager;
+
+class GetConfigRequest;
+class CalculateExchangeRequest;
+class UpdateCacheRequest;
+
+class GetConfigResponse;
+class CalculateExchangeResponse;
+class UpdateCacheResponse;
 
 class RequestProcessor
 {
