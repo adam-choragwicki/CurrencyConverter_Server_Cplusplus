@@ -30,6 +30,8 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesLis
             spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + " is not a valid JSON string");
             exit(1);
         }
+
+        alreadyCreated_ = true;
     }
     else
     {

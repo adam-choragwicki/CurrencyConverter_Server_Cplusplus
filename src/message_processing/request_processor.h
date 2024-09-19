@@ -8,6 +8,8 @@
 #include "messages/responses/update_cache_response.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 
+class DownloadManager;
+
 class RequestProcessor
 {
 public:
@@ -15,5 +17,5 @@ public:
 
     static GetConfigResponse processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank);
     static CalculateExchangeResponse processRequest(const CalculateExchangeRequest& calculateExchangeRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank);
-    static UpdateCacheResponse processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank);
+    static UpdateCacheResponse processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager);
 };

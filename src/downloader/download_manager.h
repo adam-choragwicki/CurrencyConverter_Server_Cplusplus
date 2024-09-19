@@ -18,10 +18,16 @@ public:
 class DownloadManager
 {
 public:
-    static DownloadManager& getInstance();
+    DownloadManager();
+
+    DownloadManager(const DownloadManager&) = delete;
+    DownloadManager(DownloadManager&&) = delete;
+    DownloadManager& operator=(const DownloadManager&) = delete;
+    DownloadManager& operator=(DownloadManager&&) = delete;
+    ~DownloadManager();
+
     CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
-    DownloadManager();
-    ~DownloadManager();
+    inline static bool alreadyCreated_{};
 };

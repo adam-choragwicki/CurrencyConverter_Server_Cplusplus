@@ -13,6 +13,7 @@ Application::Application(const Config& config) : config_(config)
 {
     connectionManager_ = std::make_unique<ConnectionManager>(config_);
     currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>();
+    downloadManager_ = std::make_unique<DownloadManager>();
 
     spdlog::debug("Currency converter server initialized, listening on port " + std::to_string(config_.getPort()));
     runApplication();
@@ -102,7 +103,7 @@ void Application::startClientMessageConsumingThread(ClientSocketHandler& clientS
                 else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::UPDATE_CACHE_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToUpdateCacheRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_, *downloadManager_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }

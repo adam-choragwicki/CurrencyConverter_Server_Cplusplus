@@ -35,5 +35,5 @@ private:
     std::set<CurrencyCode> currenciesCodes_;
     CurrenciesRatesCache currenciesRatesCache_;
 
-    bool alreadyCreated_{};
+    inline static bool alreadyCreated_{};
 };

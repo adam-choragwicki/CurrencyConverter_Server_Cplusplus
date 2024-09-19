@@ -5,7 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
 
-bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank)
+bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
     spdlog::info("Starting currencies exchange rates update");
 
@@ -33,7 +33,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     try
     {
-        currenciesCodesToExchangeRatesJsonsMapping = DownloadManager::getInstance().downloadCurrenciesExchangeRates(currenciesDatabank.getCurrenciesCodes());
+        currenciesCodesToExchangeRatesJsonsMapping = downloadManager.downloadCurrenciesExchangeRates(currenciesDatabank.getCurrenciesCodes());
     }
     catch(const DownloadError& exception)
     {

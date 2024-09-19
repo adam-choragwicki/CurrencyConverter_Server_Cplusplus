@@ -65,9 +65,9 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
     return calculateExchangeResponse;
 }
 
-UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank)
+UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
-    bool updateSuccessful = CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(currenciesDatabank);
+    bool updateSuccessful = CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(currenciesDatabank, downloadManager);
 
     std::string status;
 

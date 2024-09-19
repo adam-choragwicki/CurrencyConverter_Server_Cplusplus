@@ -4,6 +4,7 @@
 #include "message_processing/inbound_message_queue.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 #include "config/config.h"
+#include "downloader/download_manager.h"
 #include <atomic>
 
 class Application
@@ -29,6 +30,8 @@ private:
     const Config config_;
     std::unique_ptr<ConnectionManager> connectionManager_;
     std::unique_ptr<CurrenciesExchangeRateDatabank> currenciesExchangeRateDatabank_;
+    std::unique_ptr<DownloadManager> downloadManager_;
     std::unique_ptr<InboundMessageQueue> inboundMessageQueue_;
+
     std::mutex messageQueueMutex_;
 };
