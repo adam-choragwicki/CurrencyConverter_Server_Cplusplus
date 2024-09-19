@@ -8,4 +8,4 @@ class CurrencyCode;
 class CurrencyExchangeRatesJson;
 
 typedef std::map<CurrencyCode, CurrencyExchangeRatesJson> CurrencyCodeToCurrencyExchangeRatesJsonMapping;
-typedef std::map<CurrencyCode, std::map<CurrencyCode, ExchangeRateData>> CurrenciesRatesCache;
+typedef std::map<CurrencyCode, std::map<CurrencyCode, ExchangeRateData>> CurrenciesExchangeRatesCache;

@@ -14,7 +14,7 @@ class JsonParser
 public:
     JsonParser() = delete;
 
-    static std::set<CurrencyCode> parseJsonToCurrenciesCodes(const std::string& string);
+    static std::set<CurrencyCode> parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string);
     static std::map<CurrencyCode, ExchangeRateData> extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
                                                                                                                    const std::set<CurrencyCode>& currenciesCodes,
                                                                                                                    const CurrencyExchangeRatesJson& currencyExchangeRatesJson);

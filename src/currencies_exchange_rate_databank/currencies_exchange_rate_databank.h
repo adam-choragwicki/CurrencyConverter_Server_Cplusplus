@@ -28,12 +28,12 @@ public:
 private:
     static const std::string& loadCurrenciesListFileContent();
     CurrencyExchangeRatesJson loadFileForCurrency(const CurrencyCode& currencyCode);
-    void loadCacheFromFiles();
+    void loadCurrenciesExchangeRatesCacheFromFiles();
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
     const std::string currenciesListFileContent_;
     std::set<CurrencyCode> currenciesCodes_;
-    CurrenciesRatesCache currenciesRatesCache_;
+    CurrenciesExchangeRatesCache currenciesExchangeRatesCache_;
 
     inline static bool alreadyCreated_{};
 };

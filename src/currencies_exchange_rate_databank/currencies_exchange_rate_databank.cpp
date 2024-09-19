@@ -16,8 +16,8 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesLis
         {
             try
             {
-                currenciesCodes_ = JsonParser::parseJsonToCurrenciesCodes(currenciesListFileContent_);
-                loadCacheFromFiles();
+                currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
+                loadCurrenciesExchangeRatesCacheFromFiles();
             }
             catch(JsonParseError& jsonParseError)
             {
@@ -55,19 +55,19 @@ const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent
     }
 }
 
-void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
+void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles()
 {
     spdlog::debug("Loading currencies exchange rates from files");
 
-    CurrenciesRatesCache currenciesRatesCache;
+    CurrenciesExchangeRatesCache currenciesExchangeRatesCache;
 
     for(const CurrencyCode& currencyCode : currenciesCodes_)
     {
         const CurrencyExchangeRatesJson currencyExchangeRatesJson = loadFileForCurrency(currencyCode);
-        currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
+        currenciesExchangeRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
     }
 
-    currenciesRatesCache_ = currenciesRatesCache;
+    currenciesExchangeRatesCache_ = currenciesExchangeRatesCache;
 
     spdlog::debug("Loading currencies exchange rates from files... DONE");
 }
@@ -76,7 +76,7 @@ void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurren
 {
     spdlog::info("Loading currencies exchange rates from map");
 
-    CurrenciesRatesCache currenciesRatesCache;
+    CurrenciesExchangeRatesCache currenciesExchangeRatesCache;
 
     for(const CurrencyCode& currencyCode : currenciesCodes_)
     {
@@ -84,7 +84,7 @@ void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurren
 
         if(!currencyExchangeRatesJson.toString().empty())
         {
-            currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
+            currenciesExchangeRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
         }
         else
         {
@@ -92,19 +92,19 @@ void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurren
         }
     }
 
-    currenciesRatesCache_ = currenciesRatesCache;
+    currenciesExchangeRatesCache_ = currenciesExchangeRatesCache;
 
     spdlog::info("Loading currencies exchange rates from map... DONE");
 }
 
 bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
-    return currenciesRatesCache_.contains(sourceCurrencyCode) && currenciesRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
+    return currenciesExchangeRatesCache_.contains(sourceCurrencyCode) && currenciesExchangeRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
 }
 
 ExchangeRateData CurrenciesExchangeRateDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
-    return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
+    return currenciesExchangeRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
 }
 
 void CurrenciesExchangeRateDatabank::setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping)

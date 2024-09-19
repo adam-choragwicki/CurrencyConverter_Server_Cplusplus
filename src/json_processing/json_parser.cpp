@@ -7,7 +7,7 @@
 #include "json_processing/exceptions.h"
 #include "spdlog/spdlog.h"
 
-std::set<CurrencyCode> JsonParser::parseJsonToCurrenciesCodes(const std::string& string)
+std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string)
 {
     //TODO implement expected schema
     JsonReader jsonReader(string);
