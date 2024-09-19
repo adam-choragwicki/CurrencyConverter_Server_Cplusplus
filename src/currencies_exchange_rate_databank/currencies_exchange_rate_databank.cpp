@@ -3,7 +3,9 @@
 #include "utilities/file_loader.h"
 #include "config.h"
 #include "spdlog/spdlog.h"
-#include "types/definitions.h"
+#include "types/currency_code.h"
+#include "types/currency_exchange_rates_json.h"
+#include "types/exchange_rate.h"
 
 CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFileContent_(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH))
 {
@@ -24,7 +26,8 @@ void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
 
     CurrenciesRatesCache currenciesRatesCache;
 
-    currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"), CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
+    currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"),
+                                                                   CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
 
     spdlog::debug("Exchange rates timestamp: " + currenciesExchangeRatesTimestamp_.toString());
 

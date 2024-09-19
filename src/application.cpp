@@ -85,21 +85,21 @@ void Application::startClientMessageConsumingThread(ClientSocketHandler& clientS
                 if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::GET_CONFIG_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToGetConfigRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, currenciesDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, currenciesExchangeRateDatabank_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }
                 else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::CALCULATE_EXCHANGE_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToCalculateExchangeRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, currenciesDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, currenciesExchangeRateDatabank_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }
                 else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::UPDATE_CACHE_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToUpdateCacheRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, currenciesDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, currenciesExchangeRateDatabank_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }

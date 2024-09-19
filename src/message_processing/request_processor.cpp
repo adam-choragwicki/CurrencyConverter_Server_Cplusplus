@@ -4,6 +4,7 @@
 #include "converter/converter.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_updater.h"
 #include "spdlog/spdlog.h"
+#include "types/exchange_rate.h"
 
 GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
 {

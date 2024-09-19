@@ -29,6 +29,6 @@ private:
     const Config config_;
     std::unique_ptr<ConnectionManager> connectionManager_;
     InboundMessageQueue inboundMessageQueue_;
-    CurrenciesExchangeRateDatabank currenciesDatabank_;
+    CurrenciesExchangeRateDatabank currenciesExchangeRateDatabank_;
     std::mutex messageQueueMutex_;
 };

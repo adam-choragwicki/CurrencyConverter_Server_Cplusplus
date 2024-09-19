@@ -1,11 +1,11 @@
 #pragma once
 
-#include "types/currency_code.h"
-#include "types/exchange_rate.h"
 #include "types/timestamp.h"
-#include "types/currency_exchange_rates_json.h"
+
+//#include "types/exchange_rate.h"
+//#include "types/currency_exchange_rates_json.h"
 #include "types/definitions.h"
-#include <map>
+#include "types/currency_code.h"
 #include <set>
 
 class CurrenciesExchangeRateDatabank
