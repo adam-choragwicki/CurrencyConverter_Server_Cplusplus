@@ -20,4 +20,6 @@ public:
                                                                                                            const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
 
     static Timestamp parseTimestamp(const CurrencyCode& currencyCode, const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
+
+    static bool isValidJsonString(const std::string& string);
 };

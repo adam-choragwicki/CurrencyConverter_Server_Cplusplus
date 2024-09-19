@@ -4,18 +4,34 @@
 #include "types/exchange_rate.h"
 #include "types/timestamp.h"
 #include "types/currency_exchange_rates_json.h"
+#include "json_processing/exceptions.h"
 #include "spdlog/spdlog.h"
 
 std::set<CurrencyCode> JsonParser::parseJsonToCurrenciesCodes(const std::string& string)
 {
+    //TODO implement expected schema
     JsonReader jsonReader(string);
 
     auto keyValuePairs = jsonReader.getKeyValuePairs();
+
+    if(keyValuePairs.empty())
+    {
+        throw JsonParseError("Could not parse any currencies codes-names key-value pairs");
+    }
 
     std::set<CurrencyCode> currenciesCodes;
 
     for(const auto&[key, value] : keyValuePairs)
     {
+        if(key.empty())
+        {
+            throw JsonParseError("Key is empty");
+        }
+        else if(value.empty())
+        {
+            throw JsonParseError("Value for '" + key + "' is empty");
+        }
+
         currenciesCodes.insert(CurrencyCode(value));
     }
 
@@ -64,4 +80,10 @@ Timestamp JsonParser::parseTimestamp(const CurrencyCode& currencyCode, const Cur
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
     return Timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
+}
+
+bool JsonParser::isValidJsonString(const std::string& string)
+{
+    rapidjson::Document document;
+    return !document.Parse(string.c_str()).HasParseError();
 }

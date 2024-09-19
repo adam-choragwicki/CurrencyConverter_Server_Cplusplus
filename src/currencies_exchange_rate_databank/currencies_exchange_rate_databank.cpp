@@ -6,13 +6,31 @@
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
 #include "types/exchange_rate.h"
+#include "json_processing/exceptions.h"
 
 CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesListFileContent_(loadCurrenciesListFileContent())
 {
     if(!alreadyCreated_)
     {
-        currenciesCodes_ = JsonParser::parseJsonToCurrenciesCodes(currenciesListFileContent_);
-        loadCacheFromFiles();
+        //TODO parse only once
+        if(JsonParser::isValidJsonString(currenciesListFileContent_))
+        {
+            try
+            {
+                currenciesCodes_ = JsonParser::parseJsonToCurrenciesCodes(currenciesListFileContent_);
+                loadCacheFromFiles();
+            }
+            catch(JsonParseError& jsonParseError)
+            {
+                spdlog::critical("Error while processing content of '{}', {}", CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH, jsonParseError.what());
+                exit(1);
+            }
+        }
+        else
+        {
+            spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + " is not a valid JSON string");
+            exit(1);
+        }
     }
     else
     {
