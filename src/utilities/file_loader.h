@@ -30,4 +30,10 @@ public:
             throw std::runtime_error("Could not open " + path + " file");
         }
     }
+
+    static bool fileExists(const std::string& path)
+    {
+        std::ifstream inputFile(path);
+        return inputFile.good();
+    }
 };

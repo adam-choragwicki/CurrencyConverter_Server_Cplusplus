@@ -33,6 +33,7 @@ public:
     void setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping);
 
 private:
+    static const std::string& loadCurrenciesFileContent();
     void loadCacheFromFiles();
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 

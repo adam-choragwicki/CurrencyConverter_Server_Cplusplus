@@ -7,7 +7,7 @@
 #include "types/currency_exchange_rates_json.h"
 #include "types/exchange_rate.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFileContent_(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH))
+CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFileContent_(loadCurrenciesFileContent())
 {
     if(!alreadyCreated_)
     {
@@ -20,6 +20,20 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFil
     }
 
     spdlog::debug("Currencies exchange rate databank initialized");
+}
+
+const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesFileContent()
+{
+    if(FileLoader::fileExists(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH))
+    {
+        static const std::string fileContent = FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH);
+        return fileContent;
+    }
+    else
+    {
+        spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH + " does not exist");
+        exit(1);
+    }
 }
 
 void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
