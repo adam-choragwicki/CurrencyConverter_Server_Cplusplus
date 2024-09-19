@@ -40,13 +40,14 @@ std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCod
 
 std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(const CurrencyCode& sourceCurrencyCode,
                                                                                                                        const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                                       const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
+                                                                                                                       const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
+                                                                                                                       bool allKeysExistenceRequired)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 
     std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap;
 
-    std::set<CurrencyCode> alreadyWarned;
+    //    std::set<CurrencyCode> alreadyWarned;
 
     for(const CurrencyCode& currencyCode : currenciesCodes)
     {
@@ -57,23 +58,40 @@ std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStrin
         }
         else
         {
+            //TODO if everything is first time loaded and mandatory present
+
             if(jsonReader.hasKey(currencyCode.toString()))
             {
-                const ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
-                const Timestamp timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
-
-                ExchangeRateData exchangeRateData(exchangeRate, timestamp);
-
-                currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, exchangeRateData);
-            }
-            else
-            {
-                if(!alreadyWarned.contains(sourceCurrencyCode))
+                try
                 {
-                    spdlog::warn("Data source does not provide some exchange rates for " + sourceCurrencyCode.toUpperCase());
-                    alreadyWarned.insert(sourceCurrencyCode);
+                    const ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
+                    const Timestamp timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
+
+                    ExchangeRateData exchangeRateData(exchangeRate, timestamp);
+
+                    currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, exchangeRateData);
+                }
+                catch(const JsonMissingKeyError& jsonMissingKeyError)
+                {
+                    if(allKeysExistenceRequired)
+                    {
+                        spdlog::critical(jsonMissingKeyError.what());
+                        exit(1);
+                    }
+                    else
+                    {
+                        spdlog::warn(jsonMissingKeyError.what());
+                    }
                 }
             }
+            //            else
+            //            {
+            //                if(!alreadyWarned.contains(sourceCurrencyCode))
+            //                {
+            //                    spdlog::warn("Data source does not provide some exchange rates for " + sourceCurrencyCode.toUpperCase());
+            //                    alreadyWarned.insert(sourceCurrencyCode);
+            //                }
+            //            }
         }
     }
 

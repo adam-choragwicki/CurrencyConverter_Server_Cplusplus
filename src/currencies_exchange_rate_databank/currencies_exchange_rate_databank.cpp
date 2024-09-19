@@ -71,7 +71,7 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles()
 
             if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson);
+                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
                 currenciesExchangeRatesCache.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
             }

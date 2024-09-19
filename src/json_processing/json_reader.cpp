@@ -18,7 +18,7 @@ std::string JsonReader::getStringValue(const std::string& key) const
     }
     else
     {
-        throw std::runtime_error("Error, key does not exist: " + key);
+        throw JsonMissingKeyError(key);
     }
 }
 
@@ -32,12 +32,12 @@ std::string JsonReader::getStringValue(const std::string& key1, const std::strin
         }
         else
         {
-            throw std::runtime_error("Error, key does not exist: " + key2);
+            throw JsonMissingKeyError(key2);
         }
     }
     else
     {
-        throw std::runtime_error("Error, key does not exist: " + key1);
+        throw JsonMissingKeyError(key1);
     }
 }
 
@@ -49,7 +49,7 @@ std::string JsonReader::getNumericValueAsString(const std::string& key) const
     }
     else
     {
-        throw std::runtime_error("Error, key does not exist: " + key);
+        throw JsonMissingKeyError(key);
     }
 }
 
@@ -63,12 +63,12 @@ std::string JsonReader::getNumericValueAsString(const std::string& key1, const s
         }
         else
         {
-            throw std::runtime_error("Error, key does not exist: " + key2);
+            throw JsonMissingKeyError(key2);
         }
     }
     else
     {
-        throw std::runtime_error("Error, key does not exist: " + key1);
+        throw JsonMissingKeyError(key1);
     }
 }
 
@@ -80,7 +80,7 @@ std::string JsonReader::getNumericValueAsString(const std::string& key1, const s
     }
     else
     {
-        throw std::runtime_error("Error, key does not exist: " + key);
+        throw JsonMissingKeyError(key);
     }
 }
 
