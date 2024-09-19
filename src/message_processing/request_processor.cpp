@@ -4,15 +4,14 @@
 #include "converter/converter.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_updater.h"
 #include "spdlog/spdlog.h"
-#include "types/exchange_rate.h"
 
 GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
     const Timestamp& currenciesExchangeRateTimestamp = currenciesDatabank.getCurrenciesExchangeRateTimestamp();
-    const std::string& currenciesFileContent = currenciesDatabank.getCurrenciesFileContent();
+    const std::string& currenciesListFileContent = currenciesDatabank.getCurrenciesListFileContent();
     const CorrelationId& correlationId = getConfigRequest.getCorrelationId();
 
-    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesExchangeRateTimestamp, currenciesFileContent, correlationId);
+    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesExchangeRateTimestamp, currenciesListFileContent, correlationId);
     return getConfigResponse;
 }
 

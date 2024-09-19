@@ -24,8 +24,8 @@ public:
     void setExchangeRatesTimestamp(const Timestamp& currenciesExchangeRatesTimestamp)
     { currenciesExchangeRatesTimestamp_ = currenciesExchangeRatesTimestamp; }
 
-    [[nodiscard]] const std::string& getCurrenciesFileContent() const
-    { return currenciesFileContent_; }
+    [[nodiscard]] const std::string& getCurrenciesListFileContent() const
+    { return currenciesListFileContent_; }
 
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
     { return currenciesCodes_; }
@@ -33,11 +33,11 @@ public:
     void setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping);
 
 private:
-    static const std::string& loadCurrenciesFileContent();
+    static const std::string& loadCurrenciesListFileContent();
     void loadCacheFromFiles();
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
-    const std::string currenciesFileContent_;
+    const std::string currenciesListFileContent_;
     Timestamp currenciesExchangeRatesTimestamp_;
     std::set<CurrencyCode> currenciesCodes_;
     CurrenciesRatesCache currenciesRatesCache_;

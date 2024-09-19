@@ -7,11 +7,11 @@
 #include "types/currency_exchange_rates_json.h"
 #include "types/exchange_rate.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFileContent_(loadCurrenciesFileContent())
+CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesListFileContent_(loadCurrenciesListFileContent())
 {
     if(!alreadyCreated_)
     {
-        currenciesCodes_ = JsonParser::parseJsonToCurrenciesCodes(currenciesFileContent_);
+        currenciesCodes_ = JsonParser::parseJsonToCurrenciesCodes(currenciesListFileContent_);
         loadCacheFromFiles();
     }
     else
@@ -22,16 +22,16 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFil
     spdlog::debug("Currencies exchange rate databank initialized");
 }
 
-const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesFileContent()
+const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent()
 {
-    if(FileLoader::fileExists(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH))
+    if(FileLoader::fileExists(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
     {
-        static const std::string fileContent = FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH);
+        static const std::string fileContent = FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
         return fileContent;
     }
     else
     {
-        spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_DATA_FILE_PATH + " does not exist");
+        spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + " does not exist");
         exit(1);
     }
 }
