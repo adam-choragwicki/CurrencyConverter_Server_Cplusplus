@@ -1,9 +1,6 @@
 #pragma once
 
 #include "types/timestamp.h"
-
-//#include "types/exchange_rate.h"
-//#include "types/currency_exchange_rates_json.h"
 #include "types/definitions.h"
 #include "types/currency_code.h"
 #include <set>

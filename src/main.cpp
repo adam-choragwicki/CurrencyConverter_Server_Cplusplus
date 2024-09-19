@@ -36,3 +36,5 @@ void setupLogging(const Config& config)
     spdlog::default_logger()->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/log.txt", true));
     spdlog::flush_on(spdlog::level::debug);
 }
+
+//TODO for release mode turn off debug messages logging

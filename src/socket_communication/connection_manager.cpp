@@ -6,6 +6,8 @@ ConnectionManager::ConnectionManager(const Config& config)
     spdlog::debug("Initializing server socket");
     serverSocketHandler_ = std::make_unique<ServerSocketHandler>(config.getPort());
     spdlog::debug("Initializing server socket... DONE");
+
+    spdlog::debug("Connection manager initialized");
 }
 
 ClientSocketHandler& ConnectionManager::waitForConnectionAndAccept()

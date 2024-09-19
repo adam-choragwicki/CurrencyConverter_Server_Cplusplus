@@ -18,6 +18,8 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesFil
     {
         throw std::runtime_error("Error, trying to construct another instance of CurrenciesExchangeRateDatabank");
     }
+
+    spdlog::debug("Currencies exchange rate databank initialized");
 }
 
 void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
