@@ -38,9 +38,9 @@ std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCod
     return currenciesCodes;
 }
 
-std::map<CurrencyCode, ExchangeRateData> JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
-                                                                                                                    const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                                    const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
+std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(const CurrencyCode& sourceCurrencyCode,
+                                                                                                                       const std::set<CurrencyCode>& currenciesCodes,
+                                                                                                                       const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 

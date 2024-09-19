@@ -15,9 +15,9 @@ public:
     JsonParser() = delete;
 
     static std::set<CurrencyCode> parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string);
-    static std::map<CurrencyCode, ExchangeRateData> extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
-                                                                                                                   const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                                   const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
+    static std::map<CurrencyCode, ExchangeRateData> parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(const CurrencyCode& sourceCurrencyCode,
+                                                                                                                      const std::set<CurrencyCode>& currenciesCodes,
+                                                                                                                      const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
 
     static Timestamp parseTimestamp(const CurrencyCode& currencyCode, const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
 

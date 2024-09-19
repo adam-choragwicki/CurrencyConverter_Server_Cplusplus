@@ -27,7 +27,7 @@ public:
 
 private:
     static const std::string& loadCurrenciesListFileContent();
-    CurrencyExchangeRatesJson loadFileForCurrency(const CurrencyCode& currencyCode);
+//    CurrencyExchangeRatesJson loadFileForCurrency(const CurrencyCode& currencyCode);
     void loadCurrenciesExchangeRatesCacheFromFiles();
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
