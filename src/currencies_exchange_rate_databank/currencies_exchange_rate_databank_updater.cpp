@@ -9,9 +9,27 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 {
     spdlog::info("Starting currencies exchange rates update");
 
+    //download
+    //validate
+    //parse
+
     Timer timer;
 
     CurrencyCodeToCurrencyExchangeRatesJsonMapping currenciesCodesToExchangeRatesJsonsMapping;
+
+
+    //validate
+
+    //    for(const auto&[currencyCode, currencyRateExchangeJson] : currenciesCodesToExchangeRatesJsonsMapping)
+    //    {
+    //        if(JsonReader::isValidJson(currencyRateExchangeJson.toString()))
+    //        {
+    //            currenciesDatabank.setExchangeRate(currencyCode, currencyRateExchangeJson);
+    //        }
+    //    }
+
+    //    CurrencyCodeToCurrencyExchangeRatesJsonMappingValidator currenciesCodesToExchangeRatesJsonsMappingValidator;
+
 
     try
     {

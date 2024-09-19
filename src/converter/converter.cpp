@@ -1,6 +1,9 @@
 #include "converter.h"
 #include <iomanip>
 
+#include "types/money_amount.h"
+#include "types/exchange_rate.h"
+
 std::string Converter::convert(const MoneyAmount& moneyAmount, const ExchangeRate& exchangeRate)
 {
     return executeCalculation(moneyAmount, exchangeRate);
@@ -8,15 +11,13 @@ std::string Converter::convert(const MoneyAmount& moneyAmount, const ExchangeRat
 
 std::string Converter::executeCalculation(const MoneyAmount& moneyAmount, const ExchangeRate& exchangeRate)
 {
-    double moneyAmountNumeric = std::stod(moneyAmount.toString());
-    double exchangeRateNumeric = std::stod(exchangeRate.toString());
+    const double moneyAmountNumeric = std::stod(moneyAmount.toString());
+    const double exchangeRateNumeric = std::stod(exchangeRate.toString());
 
-    double result = exchangeRateNumeric * moneyAmountNumeric;
+    const double result = moneyAmountNumeric * exchangeRateNumeric;
 
     std::ostringstream oss;
     oss << std::setprecision(2) << std::noshowpoint << std::fixed << result;
 
-    std::string resultString = oss.str();
-
-    return resultString;
+    return oss.str();
 }

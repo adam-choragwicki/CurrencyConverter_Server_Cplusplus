@@ -1,8 +1,9 @@
 #pragma once
 
-#include "types/currency_code.h"
-#include "types/exchange_rate.h"
-#include "types/money_amount.h"
+#include <string>
+
+class MoneyAmount;
+class ExchangeRate;
 
 class Converter
 {
