@@ -46,17 +46,20 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     spdlog::info("Downloaded all exchange rates");
 
-    /*Get exchange rates timestamp from EUR-USD rate JSON because it is always present in the data*/
-    Timestamp exchangeRatesTimestamp = JsonParser::parseTimestamp(CurrencyCode("eur"), currenciesCodesToExchangeRatesJsonsMapping.at(CurrencyCode("usd")));
+    //    /*Get exchange rates timestamp from EUR-USD rate JSON because it is always present in the data*/
+    //    Timestamp exchangeRatesTimestamp = JsonParser::parseTimestamp(CurrencyCode("eur"), currenciesCodesToExchangeRatesJsonsMapping.at(CurrencyCode("usd")));
 
-    updateCache(currenciesCodesToExchangeRatesJsonsMapping, exchangeRatesTimestamp, currenciesDatabank);
+    //    updateCache(currenciesCodesToExchangeRatesJsonsMapping, exchangeRatesTimestamp, currenciesDatabank);
 
-    spdlog::info("Cache updated successfully in " + timer.getResult() + ". New exchange rates timestamp is " + exchangeRatesTimestamp.toString());
+    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
+
+    //    spdlog::info("Cache updated successfully in " + timer.getResult() + ". New exchange rates timestamp is " + exchangeRatesTimestamp.toString());
+
+    spdlog::info("Cache updated successfully in " + timer.getResult());
 
     return true;
 }
 
 void CurrenciesExchangeRateDatabankUpdater::updateCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping, const Timestamp& exchangeRatesTimestamp, CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
-    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
 }

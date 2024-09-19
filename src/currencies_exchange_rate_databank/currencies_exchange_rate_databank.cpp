@@ -73,7 +73,17 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles()
             {
                 const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
-                currenciesExchangeRatesCache.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
+                for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
+                {
+                    if(!exchangeRateData.isNull())
+                    {
+                        currenciesExchangeRatesCache.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
+                    }
+                    else
+                    {
+                        spdlog::error("Wrong new exchange rate data, previous exchange rate will be kept for consistency");
+                    }
+                }
             }
             else
             {

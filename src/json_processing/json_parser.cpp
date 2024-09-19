@@ -81,6 +81,7 @@ std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStrin
                     else
                     {
                         spdlog::warn(jsonMissingKeyError.what());
+                        currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, ExchangeRateData(ExchangeRate("NULL"), Timestamp("NULL")));
                     }
                 }
             }

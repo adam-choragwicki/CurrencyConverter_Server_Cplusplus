@@ -15,6 +15,17 @@ public:
     [[nodiscard]] const Timestamp& getTimestamp() const
     { return timestamp_; }
 
+    void setNull()
+    {
+        exchangeRate_ = ExchangeRate("NULL");
+        timestamp_ = Timestamp("NULL");
+    }
+
+    [[nodiscard]] bool isNull() const
+    {
+        return exchangeRate_.toString() == "NULL" || timestamp_.toString() == "NULL";
+    }
+
 private:
     ExchangeRate exchangeRate_;
     Timestamp timestamp_;
