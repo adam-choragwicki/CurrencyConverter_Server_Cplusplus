@@ -31,7 +31,7 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
         if(currenciesDatabank.containsExchangeRate(sourceCurrencyCode, targetCurrencyCode))
         {
             status = MessageContract::MessageContent::CalculateExchangeResponseContract::OK_STATUS;
-            calculationResult = Converter::convert(moneyAmount, currenciesDatabank.getExchangeRate(sourceCurrencyCode, targetCurrencyCode));
+            calculationResult = Converter::convert(moneyAmount, currenciesDatabank.getExchangeRateForCurrenciesPair(sourceCurrencyCode, targetCurrencyCode));
             failureReason = MessageContract::MessageContent::NONE;
         }
         else

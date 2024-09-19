@@ -16,10 +16,16 @@ public:
     CurrenciesExchangeRateDatabank& operator=(CurrenciesExchangeRateDatabank&&) = delete;
 
     [[nodiscard]] bool containsExchangeRate(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
-    [[nodiscard]] ExchangeRate getExchangeRate(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
+    [[nodiscard]] ExchangeRate getExchangeRateForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
+
+    //    [[nodiscard]] const Timestamp& getCurrenciesExchangeRateTimestamp() const
+    //    { return currenciesExchangeRatesTimestamp_; }
+    //
+    //    void setExchangeRatesTimestamp(const Timestamp& currenciesExchangeRatesTimestamp)
+    //    { currenciesExchangeRatesTimestamp_ = currenciesExchangeRatesTimestamp; }
 
     [[nodiscard]] const Timestamp& getCurrenciesExchangeRateTimestamp() const
-    { return currenciesExchangeRatesTimestamp_; }
+    { return *(new Timestamp("0"));}
 
     void setExchangeRatesTimestamp(const Timestamp& currenciesExchangeRatesTimestamp)
     { currenciesExchangeRatesTimestamp_ = currenciesExchangeRatesTimestamp; }
@@ -34,6 +40,7 @@ public:
 
 private:
     static const std::string& loadCurrenciesListFileContent();
+    CurrencyExchangeRatesJson loadFileForCurrency(const CurrencyCode& currencyCode);
     void loadCacheFromFiles();
     void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 

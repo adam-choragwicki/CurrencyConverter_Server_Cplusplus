@@ -60,15 +60,15 @@ void CurrenciesExchangeRateDatabank::loadCacheFromFiles()
 
     CurrenciesRatesCache currenciesRatesCache;
 
-    currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"),
-                                                                   CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
-
-    spdlog::debug("Exchange rates timestamp: " + currenciesExchangeRatesTimestamp_.toString());
+//    currenciesExchangeRatesTimestamp_ = JsonParser::parseTimestamp(CurrencyCode("eur"),
+//                                                                   CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + CurrencyCode("usd").toString() + ".json")));
+//
+//    spdlog::debug("Exchange rates timestamp: " + currenciesExchangeRatesTimestamp_.toString());
 
     for(const CurrencyCode& currencyCode : currenciesCodes_)
     {
-        const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + currencyCode.toString() + ".json"));
-        currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
+        const CurrencyExchangeRatesJson currencyExchangeRatesJson = loadFileForCurrency(currencyCode);
+        currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
     }
 
     currenciesRatesCache_ = currenciesRatesCache;
@@ -88,7 +88,7 @@ void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurren
 
         if(!currencyExchangeRatesJson.toString().empty())
         {
-            currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
+            currenciesRatesCache.insert_or_assign(currencyCode, JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
         }
         else
         {
@@ -106,12 +106,18 @@ bool CurrenciesExchangeRateDatabank::containsExchangeRate(const CurrencyCode& so
     return currenciesRatesCache_.contains(sourceCurrencyCode) && currenciesRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
 }
 
-ExchangeRate CurrenciesExchangeRateDatabank::getExchangeRate(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+ExchangeRate CurrenciesExchangeRateDatabank::getExchangeRateForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
-    return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
+    return currenciesRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode).getExchangeRate();
 }
 
 void CurrenciesExchangeRateDatabank::setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping)
 {
     loadCacheFromMap(currenciesCodesToExchangeRatesJsonsMapping);
+}
+
+CurrencyExchangeRatesJson CurrenciesExchangeRateDatabank::loadFileForCurrency(const CurrencyCode& currencyCode)
+{
+    CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + currencyCode.toString() + ".json"));
+    return currencyExchangeRatesJson;
 }

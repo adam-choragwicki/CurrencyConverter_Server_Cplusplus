@@ -1,7 +1,7 @@
 #include "json_parser.h"
 #include "json_reader.h"
 #include "types/currency_code.h"
-#include "types/exchange_rate.h"
+#include "types/containers/exchange_rate_data.h"
 #include "types/timestamp.h"
 #include "types/currency_exchange_rates_json.h"
 #include "json_processing/exceptions.h"
@@ -38,13 +38,13 @@ std::set<CurrencyCode> JsonParser::parseJsonToCurrenciesCodes(const std::string&
     return currenciesCodes;
 }
 
-std::map<CurrencyCode, ExchangeRate> JsonParser::extractAllExchangeRatesFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
-                                                                                                            const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                            const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
+std::map<CurrencyCode, ExchangeRateData> JsonParser::extractAllExchangeRatesDataFromCurrencyExchangeRatesJsonString(const CurrencyCode& sourceCurrencyCode,
+                                                                                                                    const std::set<CurrencyCode>& currenciesCodes,
+                                                                                                                    const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 
-    std::map<CurrencyCode, ExchangeRate> currencyCodeToExchangeRateMap;
+    std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap;
 
     std::set<CurrencyCode> alreadyWarned;
 
@@ -59,8 +59,12 @@ std::map<CurrencyCode, ExchangeRate> JsonParser::extractAllExchangeRatesFromCurr
         {
             if(jsonReader.hasKey(currencyCode.toString()))
             {
-                ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
-                currencyCodeToExchangeRateMap.insert_or_assign(currencyCode, exchangeRate);
+                const ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
+                const Timestamp timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
+
+                ExchangeRateData exchangeRateData(exchangeRate, timestamp);
+
+                currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, exchangeRateData);
             }
             else
             {
@@ -73,7 +77,7 @@ std::map<CurrencyCode, ExchangeRate> JsonParser::extractAllExchangeRatesFromCurr
         }
     }
 
-    return currencyCodeToExchangeRateMap;
+    return currencyCodeToExchangeRateDataMap;
 }
 
 Timestamp JsonParser::parseTimestamp(const CurrencyCode& currencyCode, const CurrencyExchangeRatesJson& currencyExchangeRatesJson)
