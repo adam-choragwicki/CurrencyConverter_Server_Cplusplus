@@ -19,6 +19,26 @@ public:
         return currencyCodesOfSuccessfullyDownloadedFiles_;
     }
 
+    void addCurrencyCodeOfSuccessfullyDownloadedFile(const CurrencyCode& currencyCode)
+    {
+        auto[_, inserted] = currencyCodesOfSuccessfullyDownloadedFiles_.insert(currencyCode);
+
+        if(!inserted)
+        {
+            throw std::runtime_error("Adding duplicate currency code");
+        }
+    }
+
+    void addDataForFailedDownload(const CurrencyCode& currencyCode, const std::string& failureReason)
+    {
+        auto[_, inserted] = errorDescriptionsPerCurrencyCode_.insert_or_assign(currencyCode, failureReason);
+
+        if(!inserted)
+        {
+            throw std::runtime_error("Adding duplicate currency code");
+        }
+    }
+
 private:
     int requestedFilesToBeDownloadedCount_;
     int filesDownloadedSuccessfullyCount_;

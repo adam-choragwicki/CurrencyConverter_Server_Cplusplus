@@ -191,19 +191,24 @@ void CurlManager::handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandl
         if(responseCode == 200)
         {
             /*OK*/
+            downloadReport_.addCurrencyCodeOfSuccessfullyDownloadedFile(currencyCode);
             continue;
-        }
-
-        std::string message = "Error occurred when trying to download data for " + currencyCode.toString() + ", HTTP code: " + std::to_string(responseCode);
-
-        if(responseCode == 403 || responseCode == 404)
-        {
-            message += "\nThe currency JSON file is probably no longer available";
-            spdlog::error(message);
         }
         else
         {
-            throw CurlError(message);
+            std::string message = "Error occurred when trying to download data for " + currencyCode.toString() + ", HTTP code: " + std::to_string(responseCode);
+
+            if(responseCode == 403 || responseCode == 404)
+            {
+                message += "\nThe currency JSON file is probably no longer available";
+                downloadReport_.addDataForFailedDownload(currencyCode, message);
+                spdlog::error(message);
+            }
+            else
+            {
+                downloadReport_.addDataForFailedDownload(currencyCode, message);
+                throw CurlError(message);
+            }
         }
     }
 }
