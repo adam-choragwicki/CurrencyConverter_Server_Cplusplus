@@ -1,6 +1,7 @@
 #include "common_test_fixture.h"
 #include "converter/converter.h"
 #include "stubs/currencies_databank_stub.h"
+#include "types/money_amount.h"
 
 class ConverterTest : public CommonTestFixture
 {

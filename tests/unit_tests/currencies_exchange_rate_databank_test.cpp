@@ -6,25 +6,23 @@ class CurrenciesDatabankTest : public CommonTestFixture
 public:
     CurrenciesDatabankTest() = default;
 
-    [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
-    {
-        return currenciesDatabank_.getCurrenciesCodes();
-    }
-
 protected:
     CurrenciesExchangeRateDatabank currenciesDatabank_;
 };
 
 TEST_F(CurrenciesDatabankTest, CurrenciesCount)
 {
-    EXPECT_EQ(getCurrenciesCodes().size(), 147);
+    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 147);
 }
 
 TEST_F(CurrenciesDatabankTest, AllCombinationsOfExchangeRatesArePresent)
 {
-    for(const CurrencyCode& sourceCurrencyCode : getCurrenciesCodes())
+    const auto sourceCurrencyCodes = currenciesDatabank_.getCurrenciesCodes();
+    const auto targetCurrencyCodes = currenciesDatabank_.getCurrenciesCodes();
+
+    for(const CurrencyCode& sourceCurrencyCode : sourceCurrencyCodes)
     {
-        for(const CurrencyCode& targetCurrencyCode : getCurrenciesCodes())
+        for(const CurrencyCode& targetCurrencyCode : targetCurrencyCodes)
         {
             if(sourceCurrencyCode != targetCurrencyCode)
             {

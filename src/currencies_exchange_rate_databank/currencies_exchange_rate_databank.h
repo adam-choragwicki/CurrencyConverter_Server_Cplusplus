@@ -8,6 +8,7 @@ class CurrenciesExchangeRateDatabank
 {
 public:
     CurrenciesExchangeRateDatabank();
+    ~CurrenciesExchangeRateDatabank();
 
     CurrenciesExchangeRateDatabank(const CurrenciesExchangeRateDatabank&) = delete;
     CurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank&&) = delete;

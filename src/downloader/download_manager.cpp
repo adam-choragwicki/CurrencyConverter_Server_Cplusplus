@@ -27,6 +27,8 @@ DownloadManager::~DownloadManager()
     curl_global_cleanup();
 
     spdlog::debug("Destroying DownloadManager, CURL cleaned up");
+
+    alreadyCreated_ = false;
 }
 
 DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::set<CurrencyCode>& currenciesCodes)

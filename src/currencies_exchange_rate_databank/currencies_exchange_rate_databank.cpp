@@ -41,6 +41,11 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesLis
     spdlog::debug("Currencies exchange rate databank initialized");
 }
 
+CurrenciesExchangeRateDatabank::~CurrenciesExchangeRateDatabank()
+{
+    alreadyCreated_ = false;
+}
+
 const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent()
 {
     if(FileLoader::fileExists(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
