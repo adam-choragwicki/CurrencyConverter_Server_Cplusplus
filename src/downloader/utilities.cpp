@@ -46,11 +46,13 @@ void Utilities::saveToFile(CURL* curl, const std::string& filePath)
         throw std::runtime_error("Failed to open file: " + filePath);
     }
 
-    // Set the write function to fwrite
+    /* Set the write function to fwrite */
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
 
-    // Pass the file pointer as the data to write into
+    /* Pass the file pointer as the memory to write into */
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+
+    fclose(file);
 }
 
 timeval Utilities::getTimeout(CURLM* multiHandle)
