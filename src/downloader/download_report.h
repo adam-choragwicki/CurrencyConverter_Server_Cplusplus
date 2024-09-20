@@ -31,12 +31,15 @@ public:
 
     void addDataForFailedDownload(const CurrencyCode& currencyCode, const std::string& failureReason)
     {
-        auto[_, inserted] = errorDescriptionsPerCurrencyCode_.insert_or_assign(currencyCode, failureReason);
+        /* Check if the currency code already has two errors recorded */
+        auto range = errorDescriptionsPerCurrencyCode_.equal_range(currencyCode);
 
-        if(!inserted)
+        if(std::distance(range.first, range.second) >= 2)
         {
-            throw std::runtime_error("Adding duplicate currency code");
+            throw std::runtime_error("Adding third error for currency code: " + currencyCode.toString());
         }
+
+        errorDescriptionsPerCurrencyCode_.emplace(currencyCode, failureReason);
     }
 
 private:
@@ -47,5 +50,5 @@ private:
     const std::string DOWNLOAD_DIRECTORY_PATH;
 
     std::set<CurrencyCode> currencyCodesOfSuccessfullyDownloadedFiles_;
-    std::map<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_;
+    std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_;
 };

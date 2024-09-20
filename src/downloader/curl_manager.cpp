@@ -14,7 +14,7 @@ DownloadReport CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& c
 {
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
-    setupDownload(curlMultiHandle, currenciesCodes, responsesContents);
+    setupDownload(curlMultiHandle, currenciesCodes);
 
     startBatchDownload(curlMultiHandle.get());
 
@@ -25,22 +25,10 @@ DownloadReport CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& c
         curl_multi_remove_handle(curlMultiHandle.get(), handle.get());
     }
 
-//    for(const auto&[currencyCode, currencyExchangeRatesJson] : responsesContents)
-//    {
-//        if(!currencyExchangeRatesJson.empty())
-//        {
-//            currencyCodeToCurrencyExchangeRatesJsonMapping.try_emplace(currencyCode, currencyExchangeRatesJson);
-//        }
-//        else
-//        {
-//            spdlog::warn("No data downloaded for " + currencyCode.toUpperCase());
-//        }
-//    }
-
     return downloadReport_;
 }
 
-void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
+void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes)
 {
     for(const CurrencyCode& currencyCode : currenciesCodes)
     {
@@ -60,8 +48,8 @@ void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const st
 
             currencyCodesToFilesMapping_[currencyCode] = file;
 
-            const auto&[iter1, _1] = currencyCodesToHandlesMapping_.try_emplace(currencyCode, Utilities::createEasyHandle());
-            const auto& handle = iter1->second.get();
+            const auto&[iter, _] = currencyCodesToHandlesMapping_.try_emplace(currencyCode, Utilities::createEasyHandle());
+            const auto& handle = iter->second.get();
 
             curl_easy_setopt(handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
             curl_easy_setopt(handle, CURLOPT_PIPEWAIT, 1L);
@@ -129,18 +117,28 @@ void CurlManager::startBatchDownload(CURLM* multiHandle)
                 {
                     spdlog::info(std::string("Downloaded ") + url);
 
-                    if(logFileSize_)
+                    double fileSize = 0;
+                    curl_easy_getinfo(handle, CURLINFO_SIZE_DOWNLOAD, &fileSize);
+
+                    if(fileSize == 0)
                     {
-                        double fileSize = 0;
-                        curl_easy_getinfo(handle, CURLINFO_SIZE_DOWNLOAD, &fileSize);
+                        std::string errorMsg = "Downloaded file is empty: " + std::string(url);
+                        spdlog::error(errorMsg);
+                        downloadReport_.addDataForFailedDownload(CurrencyCode(url), errorMsg);
+                        continue;
+                    }
+                    else
+                    {
+                        if(logFileSize_)
+                        {
+                            double fileSizeInKB = fileSize / 1024.0;
 
-                        double fileSizeInKB = fileSize / 1024.0;
+                            std::ostringstream formattedSize;
+                            formattedSize.precision(2);
+                            formattedSize << std::fixed << fileSizeInKB;
 
-                        std::ostringstream formattedSize;
-                        formattedSize.precision(2);
-                        formattedSize << std::fixed << fileSizeInKB;
-
-                        spdlog::info("Downloaded file size: " + formattedSize.str() + " KB");
+                            spdlog::info("Downloaded file size: " + formattedSize.str() + " KB");
+                        }
                     }
                 }
                 else

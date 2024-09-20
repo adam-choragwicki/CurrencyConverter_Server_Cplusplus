@@ -24,7 +24,7 @@ public:
     DownloadReport downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
-    void setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);
+    void setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes);
     void startBatchDownload(CURLM* multiHandle);
 
     void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
