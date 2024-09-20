@@ -33,6 +33,9 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing
         }
     }
 
+    verbose_ = false;
+    logFileSize_ = true;
+
     return currencyCodeToCurrencyExchangeRatesJsonMapping;
 }
 
@@ -51,6 +54,11 @@ std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMult
             curl_easy_setopt(handle, CURLOPT_PIPEWAIT, 1L);
             curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
             curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 1L);
+
+            if(verbose_)
+            {
+                curl_easy_setopt(handle, CURLOPT_VERBOSE, 1L);
+            }
 
             const std::string url = "https://www.floatrates.com/daily/" + currencyCode.toString() + ".json";
             curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
@@ -103,6 +111,13 @@ void CurlManager::startDownload(CURLM* multiHandle)
                 if(message->data.result == CURLE_OK && url)
                 {
                     spdlog::info(std::string("Downloaded ") + url);
+
+                    if(logFileSize_)
+                    {
+                        long fileSize = 0;
+                        curl_easy_getinfo(handle, CURLINFO_SIZE_DOWNLOAD, &fileSize);
+                        spdlog::info("Downloaded file size: " + std::to_string(fileSize) + " bytes");
+                    }
                 }
                 else
                 {
@@ -122,6 +137,7 @@ void CurlManager::startDownload(CURLM* multiHandle)
             curl_multi_perform(multiHandle, &handlesStillRunningCount);
         }
     }
+
 
     spdlog::info("Finished downloads");
 }

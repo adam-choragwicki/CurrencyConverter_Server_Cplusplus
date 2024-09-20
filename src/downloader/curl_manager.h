@@ -24,4 +24,7 @@ private:
     static std::map<CurrencyCode, CurlEasyHandle> setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);
     static void startDownload(CURLM* multiHandle);
     static void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
+
+    inline static bool verbose_{};
+    inline static bool logFileSize_{};
 };
