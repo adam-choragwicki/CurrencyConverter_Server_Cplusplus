@@ -148,31 +148,6 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
     spdlog::debug("Updating currencies exchange rates from files... DONE");
 }
 
-//void CurrenciesExchangeRateDatabank::loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons)
-//{
-//    spdlog::info("Loading currencies exchange rates from map");
-//
-//    CurrenciesExchangeRatesCache currenciesExchangeRatesCache;
-//
-//    for(const CurrencyCode& currencyCode : currenciesCodes_)
-//    {
-//        const CurrencyExchangeRatesJson& currencyExchangeRatesJson = currenciesCodesToExchangeRatesJsons.at(currencyCode);
-//
-//        if(!currencyExchangeRatesJson.toString().empty())
-//        {
-//            currenciesExchangeRatesCache.insert_or_assign(currencyCode, JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson));
-//        }
-//        else
-//        {
-//            spdlog::warn("Currency exchange rates JSON for " + currencyCode.toUpperCase() + " is empty");
-//        }
-//    }
-//
-//    currenciesExchangeRatesCache_ = currenciesExchangeRatesCache;
-//
-//    spdlog::info("Loading currencies exchange rates from map... DONE");
-//}
-
 bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
     return currenciesExchangeRatesCache_.contains(sourceCurrencyCode) && currenciesExchangeRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
@@ -182,14 +157,3 @@ ExchangeRateData CurrenciesExchangeRateDatabank::getExchangeRateDataForCurrencie
 {
     return currenciesExchangeRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
 }
-
-//void CurrenciesExchangeRateDatabank::setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping)
-//{
-//    loadCacheFromMap(currenciesCodesToExchangeRatesJsonsMapping);
-//}
-
-//CurrencyExchangeRatesJson CurrenciesExchangeRateDatabank::loadFileForCurrency(const CurrencyCode& currencyCode)
-//{
-//    CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH + currencyCode.toString() + ".json"));
-//    return currencyExchangeRatesJson;
-//}

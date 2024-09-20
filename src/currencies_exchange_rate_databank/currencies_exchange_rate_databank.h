@@ -24,17 +24,11 @@ public:
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
     { return currenciesCodes_; }
 
-    //    void setCache(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsonsMapping);
-
     void updateCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
     void loadCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
 
 private:
     static const std::string& loadCurrenciesListFileContent();
-
-
-    //    CurrencyExchangeRatesJson loadFileForCurrency(const CurrencyCode& currencyCode);
-    //    void loadCacheFromMap(const CurrencyCodeToCurrencyExchangeRatesJsonMapping& currenciesCodesToExchangeRatesJsons);
 
     const std::string currenciesListFileContent_;
     std::set<CurrencyCode> currenciesCodes_;
