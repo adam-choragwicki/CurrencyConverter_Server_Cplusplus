@@ -8,7 +8,6 @@
 #include "types/definitions.h"
 #include "types/currency_exchange_rates_json.h"
 #include "downloader/download_report.h"
-#include <optional>
 
 bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
@@ -35,7 +34,6 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     //    CurrencyCodeToCurrencyExchangeRatesJsonMappingValidator currenciesCodesToExchangeRatesJsonsMappingValidator;
 
-    //    std::optional<DownloadReport> downloadReport;
     std::unique_ptr<DownloadReport> downloadReport;
 
     try
@@ -61,6 +59,12 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     const std::string downloadDirectoryPath = downloadReport->getDownloadDirectoryPath();
     std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport->getCurrencyCodesOfSuccessfullyDownloadedFiles();
+
+    if(currenciesCodesOfSuccessfullyDownloadedFiles_.empty())
+    {
+        spdlog::error("Error, no successfully downloaded currencies exchange rates files\nCache update aborted");
+        return false;
+    }
 
     currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
 
