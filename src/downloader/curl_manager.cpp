@@ -6,6 +6,9 @@
 
 CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
 {
+    verbose_ = false;
+    logFileSize_ = true;
+
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
     std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping = setupDownload(curlMultiHandle, currenciesCodes, responsesContents);
@@ -32,9 +35,6 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing
             spdlog::warn("No data downloaded for " + currencyCode.toUpperCase());
         }
     }
-
-    verbose_ = false;
-    logFileSize_ = true;
 
     return currencyCodeToCurrencyExchangeRatesJsonMapping;
 }

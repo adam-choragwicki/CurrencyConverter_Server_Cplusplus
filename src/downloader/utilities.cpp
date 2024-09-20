@@ -38,21 +38,13 @@ void Utilities::saveToString(CURL* curl, std::string& currencyExchangeRatesJson)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &currencyExchangeRatesJson);
 }
 
-void Utilities::saveToFile(CURL* curl, const std::string& filePath)
+void Utilities::saveToFile(CURL* curl, FILE* file)
 {
-    FILE* file = fopen(filePath.c_str(), "wb"); // Use "wb" for binary write
-    if(!file)
-    {
-        throw std::runtime_error("Failed to open file: " + filePath);
-    }
-
     /* Set the write function to fwrite */
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
 
     /* Pass the file pointer as the memory to write into */
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-
-    fclose(file);
 }
 
 timeval Utilities::getTimeout(CURLM* multiHandle)
