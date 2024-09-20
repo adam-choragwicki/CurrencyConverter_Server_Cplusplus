@@ -2,6 +2,7 @@
 #include "types/currency_code.h"
 #include "curl_manager.h"
 #include "curl/curl.h"
+#include "download_report.h"
 #include "spdlog/spdlog.h"
 #include <filesystem>
 
@@ -28,7 +29,7 @@ DownloadManager::~DownloadManager()
     spdlog::debug("Destroying DownloadManager, CURL cleaned up");
 }
 
-CurrencyCodeToCurrencyExchangeRatesJsonMapping DownloadManager::downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes)
+DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::set<CurrencyCode>& currenciesCodes)
 {
     try
     {

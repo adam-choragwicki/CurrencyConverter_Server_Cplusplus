@@ -5,19 +5,19 @@
 #include "types/definitions.h"
 #include <sstream>
 
-CurlManager::CurlManager(const std::string& downloadDirectoryPath) : DOWNLOAD_DIRECTORY_PATH(downloadDirectoryPath)
+CurlManager::CurlManager(const std::string& downloadDirectoryPath) : DOWNLOAD_DIRECTORY_PATH(downloadDirectoryPath), downloadReport_(DOWNLOAD_DIRECTORY_PATH)
 {
     verbose_ = false;
     logFileSize_ = true;
 }
 
-CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
+DownloadReport CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
 {
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
     setupDownload(curlMultiHandle, currenciesCodes, responsesContents);
 
-    startDownload(curlMultiHandle.get());
+    startBatchDownload(curlMultiHandle.get());
 
     handleResponseCodes(currencyCodesToHandlesMapping_);
 
@@ -32,6 +32,7 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing
     {
         if(!currencyExchangeRatesJson.empty())
         {
+
             currencyCodeToCurrencyExchangeRatesJsonMapping.try_emplace(currencyCode, currencyExchangeRatesJson);
         }
         else
@@ -40,7 +41,7 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing
         }
     }
 
-    return currencyCodeToCurrencyExchangeRatesJsonMapping;
+    return downloadReport_;
 }
 
 void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
@@ -101,9 +102,9 @@ void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const st
     curl_multi_setopt(curlMultiHandle.get(), CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
 }
 
-void CurlManager::startDownload(CURLM* multiHandle)
+void CurlManager::startBatchDownload(CURLM* multiHandle)
 {
-    spdlog::info("Starting downloads");
+    spdlog::info("Starting batch download");
 
     int handlesStillRunningCount{};
     CURLMsg* message{};
@@ -176,7 +177,7 @@ void CurlManager::startDownload(CURLM* multiHandle)
         spdlog::debug("Closed file for '{}'", currencyCode.toString());
     }
 
-    spdlog::info("Finished downloads");
+    spdlog::info("Finished batch download");
 }
 
 void CurlManager::handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping)

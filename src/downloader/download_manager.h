@@ -1,12 +1,11 @@
 #pragma once
 
-#include "types/definitions.h"
 #include <set>
 #include <map>
 #include <stdexcept>
 
 class CurrencyCode;
-class CurrencyExchangeRatesJson;
+class DownloadReport;
 
 class DownloadError : public std::runtime_error
 {
@@ -26,7 +25,7 @@ public:
     DownloadManager& operator=(DownloadManager&&) = delete;
     ~DownloadManager();
 
-    CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadCurrenciesExchangeRates(const std::set<CurrencyCode>& currenciesCodes);
+    DownloadReport downloadCurrenciesExchangeRatesFiles(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
     inline static bool alreadyCreated_{};

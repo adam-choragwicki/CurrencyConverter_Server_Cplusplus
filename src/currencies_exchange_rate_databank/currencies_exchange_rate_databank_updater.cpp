@@ -7,6 +7,8 @@
 #include "types/currency_code.h"
 #include "types/definitions.h"
 #include "types/currency_exchange_rates_json.h"
+#include "downloader/download_report.h"
+#include <optional>
 
 bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
@@ -33,10 +35,12 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     //    CurrencyCodeToCurrencyExchangeRatesJsonMappingValidator currenciesCodesToExchangeRatesJsonsMappingValidator;
 
+    //    std::optional<DownloadReport> downloadReport;
+    std::unique_ptr<DownloadReport> downloadReport;
 
     try
     {
-        currenciesCodesToExchangeRatesJsonsMapping = downloadManager.downloadCurrenciesExchangeRates(currenciesDatabank.getCurrenciesCodes());
+        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(currenciesDatabank.getCurrenciesCodes()));
     }
     catch(const DownloadError& exception)
     {
@@ -51,9 +55,14 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     //    updateCache(currenciesCodesToExchangeRatesJsonsMapping, exchangeRatesTimestamp, currenciesDatabank);
 
-//    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
+    //    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
 
     //    spdlog::info("Cache updated successfully in " + timer.getResult() + ". New exchange rates timestamp is " + exchangeRatesTimestamp.toString());
+
+    const std::string downloadDirectoryPath = downloadReport->getDownloadDirectoryPath();
+    std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport->getCurrencyCodesOfSuccessfullyDownloadedFiles();
+
+    currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
 
     spdlog::info("Cache updated successfully in " + timer.getResult());
 

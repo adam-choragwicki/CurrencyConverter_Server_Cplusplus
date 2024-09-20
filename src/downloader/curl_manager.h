@@ -2,6 +2,7 @@
 
 #include "utilities.h"
 #include "types/definitions.h"
+#include "download_report.h"
 #include <set>
 #include <map>
 
@@ -20,11 +21,11 @@ class CurlManager
 public:
     explicit CurlManager(const std::string& downloadDirectoryPath);
 
-    CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
+    DownloadReport downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
     void setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);
-    void startDownload(CURLM* multiHandle);
+    void startBatchDownload(CURLM* multiHandle);
 
     void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
 
@@ -32,6 +33,8 @@ private:
 
     std::map<CurrencyCode, FILE*> currencyCodesToFilesMapping_;
     std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping_;
+
+    DownloadReport downloadReport_;
 
     bool verbose_{};
     bool logFileSize_{};
