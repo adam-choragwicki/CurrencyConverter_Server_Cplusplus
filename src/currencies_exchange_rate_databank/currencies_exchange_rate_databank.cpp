@@ -74,7 +74,7 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
 
             if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
                 for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
                 {
@@ -118,7 +118,7 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
 
             if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
                 for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
                 {

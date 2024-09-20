@@ -15,12 +15,10 @@ public:
     JsonParser() = delete;
 
     static std::set<CurrencyCode> parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string);
-    static std::map<CurrencyCode, ExchangeRateData> parseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesMapping(const CurrencyCode& sourceCurrencyCode,
-                                                                                                                      const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                                      const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
-                                                                                                                      bool allKeysExistenceRequired = false);
-
-    static Timestamp parseTimestamp(const CurrencyCode& currencyCode, const CurrencyExchangeRatesJson& currencyExchangeRatesJson);
+    static std::map<CurrencyCode, ExchangeRateData> parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
+                                                                                                                         const std::set<CurrencyCode>& currenciesCodes,
+                                                                                                                         const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
+                                                                                                                         bool allKeysExistenceRequired = false);
 
     static bool isValidJsonString(const std::string& string);
 };
