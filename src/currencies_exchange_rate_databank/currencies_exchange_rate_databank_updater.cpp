@@ -48,23 +48,21 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     spdlog::info("Downloaded all exchange rates");
 
-    //    /*Get exchange rates timestamp from EUR-USD rate JSON because it is always present in the data*/
-    //    Timestamp exchangeRatesTimestamp = JsonParser::parseTimestamp(CurrencyCode("eur"), currenciesCodesToExchangeRatesJsonsMapping.at(CurrencyCode("usd")));
-
-    //    updateCache(currenciesCodesToExchangeRatesJsonsMapping, exchangeRatesTimestamp, currenciesDatabank);
-
-    //    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
-
-    //    spdlog::info("Cache updated successfully in " + timer.getResult() + ". New exchange rates timestamp is " + exchangeRatesTimestamp.toString());
-
     const std::string downloadDirectoryPath = downloadReport->getDownloadDirectoryPath();
+
+    std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded = downloadReport->getCurrenciesCodesOfFilesRequestedToBeDownloaded();
     std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport->getCurrencyCodesOfSuccessfullyDownloadedFiles();
+    std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_ = downloadReport->getErrorDescriptionsPerCurrencyCode();
 
     if(currenciesCodesOfSuccessfullyDownloadedFiles_.empty())
     {
         spdlog::error("Error, no successfully downloaded currencies exchange rates files\nCache update aborted");
         return false;
     }
+
+    spdlog::info("Files requested to download: {}", currenciesCodesOfFilesRequestedToBeDownloaded.size());
+    spdlog::info("Files download successfully: {}", currenciesCodesOfSuccessfullyDownloadedFiles_.size());
+    spdlog::info("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
 
     currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
 

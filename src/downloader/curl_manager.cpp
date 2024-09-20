@@ -75,6 +75,8 @@ void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const st
 
             curl_multi_add_handle(curlMultiHandle.get(), handle);
 
+            downloadReport_.addCurrencyCodeOfFileRequestedToBeDownloaded(currencyCode);
+
             spdlog::info("Queued for download: " + url);
         }
         catch(const std::exception& exception)

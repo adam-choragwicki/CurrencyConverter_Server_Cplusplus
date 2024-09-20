@@ -14,9 +14,29 @@ public:
         return DOWNLOAD_DIRECTORY_PATH;
     }
 
+    [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodesOfFilesRequestedToBeDownloaded() const
+    {
+        return currenciesCodesOfFilesRequestedToBeDownloaded_;
+    }
+
     [[nodiscard]] std::set<CurrencyCode> getCurrencyCodesOfSuccessfullyDownloadedFiles() const
     {
         return currencyCodesOfSuccessfullyDownloadedFiles_;
+    }
+
+    [[nodiscard]] const std::multimap<CurrencyCode, std::string>& getErrorDescriptionsPerCurrencyCode() const
+    {
+        return errorDescriptionsPerCurrencyCode_;
+    }
+
+    void addCurrencyCodeOfFileRequestedToBeDownloaded(const CurrencyCode& currencyCode)
+    {
+        const auto[_, inserted] = currenciesCodesOfFilesRequestedToBeDownloaded_.insert(currencyCode);
+
+        if(!inserted)
+        {
+            throw std::runtime_error("Error, trying to download duplicate file for currency '" + currencyCode.toString() + "'");
+        }
     }
 
     void addCurrencyCodeOfSuccessfullyDownloadedFile(const CurrencyCode& currencyCode)
@@ -43,12 +63,9 @@ public:
     }
 
 private:
-    int requestedFilesToBeDownloadedCount_;
-    int filesDownloadedSuccessfullyCount_;
-    int errorsCount_;
-
     const std::string DOWNLOAD_DIRECTORY_PATH;
 
+    std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded_;
     std::set<CurrencyCode> currencyCodesOfSuccessfullyDownloadedFiles_;
     std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_;
 };
