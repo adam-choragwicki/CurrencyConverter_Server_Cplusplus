@@ -71,6 +71,13 @@ void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const st
             curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
             curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 1L);
 
+            curl_easy_setopt(handle, CURLOPT_TIMEOUT, 10L); // 10 seconds timeout
+            curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, 5L); // 5 seconds connect timeout
+
+            /* TODO Progress bar etc? */
+            //curl_easy_setopt(handle, CURLOPT_PROGRESSFUNCTION, progressCallback);
+            //curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 0L); // Enable progress meter
+
             if(verbose_)
             {
                 curl_easy_setopt(handle, CURLOPT_VERBOSE, 1L);
