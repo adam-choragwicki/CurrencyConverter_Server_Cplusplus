@@ -2,7 +2,8 @@
 #include "types/currency_code.h"
 
 class CurrencyCodeTest : public CommonTestFixture
-{};
+{
+};
 
 TEST_F(CurrencyCodeTest, CurrencyCodeIsCaseInsensitive)
 {
