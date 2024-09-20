@@ -51,7 +51,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     //    updateCache(currenciesCodesToExchangeRatesJsonsMapping, exchangeRatesTimestamp, currenciesDatabank);
 
-    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
+//    currenciesDatabank.setCache(currenciesCodesToExchangeRatesJsonsMapping);
 
     //    spdlog::info("Cache updated successfully in " + timer.getResult() + ". New exchange rates timestamp is " + exchangeRatesTimestamp.toString());
 

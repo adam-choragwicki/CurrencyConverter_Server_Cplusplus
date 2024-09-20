@@ -4,20 +4,23 @@
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
 
-CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
+CurlManager::CurlManager(const std::string& downloadDirectoryPath) : DOWNLOAD_DIRECTORY_PATH(downloadDirectoryPath)
 {
     verbose_ = false;
     logFileSize_ = true;
+}
 
+CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes)
+{
     const CurlMultiHandle curlMultiHandle = Utilities::createMultiHandle();
     std::map<CurrencyCode, std::string> responsesContents;
-    std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping = setupDownload(curlMultiHandle, currenciesCodes, responsesContents);
+    setupDownload(curlMultiHandle, currenciesCodes, responsesContents);
 
     startDownload(curlMultiHandle.get());
 
-    handleResponseCodes(currencyCodesToHandlesMapping);
+    handleResponseCodes(currencyCodesToHandlesMapping_);
 
-    for(const auto&[_, handle] : currencyCodesToHandlesMapping)
+    for(const auto&[_, handle] : currencyCodesToHandlesMapping_)
     {
         curl_multi_remove_handle(curlMultiHandle.get(), handle.get());
     }
@@ -39,15 +42,27 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping CurlManager::downloadMultiplexing
     return currencyCodeToCurrencyExchangeRatesJsonMapping;
 }
 
-std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
+void CurlManager::setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents)
 {
-    std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping;
-
     for(const CurrencyCode& currencyCode : currenciesCodes)
     {
         try
         {
-            const auto&[iter1, _1] = currencyCodesToHandlesMapping.try_emplace(currencyCode, Utilities::createEasyHandle());
+            std::string fileName = DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
+            FILE* file = fopen(fileName.c_str(), "wb");
+
+            if(file)
+            {
+                spdlog::debug("Opened file '{}'", fileName);
+            }
+            else
+            {
+                throw std::runtime_error("Failed to open file: " + fileName);
+            }
+
+            currencyCodesToFilesMapping_[currencyCode] = file;
+
+            const auto&[iter1, _1] = currencyCodesToHandlesMapping_.try_emplace(currencyCode, Utilities::createEasyHandle());
             const auto& handle = iter1->second.get();
 
             curl_easy_setopt(handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
@@ -63,8 +78,7 @@ std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMult
             const std::string url = "https://www.floatrates.com/daily/" + currencyCode.toString() + ".json";
             curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
 
-            const std::string fileName = "downloaded_data/" + currencyCode.toString() + ".json";
-            Utilities::saveToFile(handle, fileName);
+            Utilities::saveToFile(handle, file);
 
             curl_multi_add_handle(curlMultiHandle.get(), handle);
 
@@ -77,8 +91,6 @@ std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMult
     }
 
     curl_multi_setopt(curlMultiHandle.get(), CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
-
-    return currencyCodesToHandlesMapping;
 }
 
 void CurlManager::startDownload(CURLM* multiHandle)
@@ -86,12 +98,18 @@ void CurlManager::startDownload(CURLM* multiHandle)
     spdlog::info("Starting downloads");
 
     int handlesStillRunningCount{};
-    CURLMsg* message;
+    CURLMsg* message{};
+
+    spdlog::debug("Before perform, Handles still running: " + std::to_string(handlesStillRunningCount));
 
     curl_multi_perform(multiHandle, &handlesStillRunningCount);
 
+    spdlog::debug("After perform, Handles still running: " + std::to_string(handlesStillRunningCount));
+
     while(handlesStillRunningCount)
     {
+        spdlog::debug("Inside loop, Handles still running: " + std::to_string(handlesStillRunningCount));
+
         struct timeval timeout = Utilities::getTimeout(multiHandle);
         int rc = Utilities::waitIfNeeded(multiHandle, timeout);
 
@@ -105,7 +123,7 @@ void CurlManager::startDownload(CURLM* multiHandle)
                 CURL* handle = message->easy_handle;
                 curl_multi_remove_handle(multiHandle, handle);
 
-                char* url = nullptr;
+                char* url{};
                 curl_easy_getinfo(message->easy_handle, CURLINFO_EFFECTIVE_URL, &url);
 
                 if(message->data.result == CURLE_OK && url)
@@ -114,9 +132,28 @@ void CurlManager::startDownload(CURLM* multiHandle)
 
                     if(logFileSize_)
                     {
-                        long fileSize = 0;
+                        double fileSize = 0;
                         curl_easy_getinfo(handle, CURLINFO_SIZE_DOWNLOAD, &fileSize);
                         spdlog::info("Downloaded file size: " + std::to_string(fileSize) + " bytes");
+                    }
+
+                    auto urlContainsCurrency = [](const std::string& url, const CurrencyCode& currencyCode)
+                    {
+                        return url.find(currencyCode.toString()) != std::string::npos;
+                    };
+
+                    // Find the file corresponding to this URL and close it
+                    for(auto&[currencyCode, file] : currencyCodesToFilesMapping_)
+                    {
+                        if(url && urlContainsCurrency(url, currencyCode))
+                        {
+                            fclose(file);
+                            currencyCodesToFilesMapping_.erase(currencyCode);
+
+                            spdlog::debug("Closed file '{}'", url);
+
+                            break;
+                        }
                     }
                 }
                 else
@@ -132,12 +169,15 @@ void CurlManager::startDownload(CURLM* multiHandle)
         }
         while(message);
 
+        spdlog::debug("After loop, Handles still running: " + std::to_string(handlesStillRunningCount));
+
         if(rc >= 0)
         {
             curl_multi_perform(multiHandle, &handlesStillRunningCount);
         }
     }
 
+    spdlog::debug("Before exiting function, Handles still running: " + std::to_string(handlesStillRunningCount));
 
     spdlog::info("Finished downloads");
 }

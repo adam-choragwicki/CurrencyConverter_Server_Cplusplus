@@ -41,7 +41,9 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping DownloadManager::downloadCurrenci
 
         std::filesystem::create_directory(DOWNLOAD_DIRECTORY_PATH);
 
-        return CurlManager::downloadMultiplexing(currenciesCodes);
+        CurlManager curlManager(DOWNLOAD_DIRECTORY_PATH);
+
+        return curlManager.downloadMultiplexing(currenciesCodes);
     }
     catch(const CurlError& exception)
     {

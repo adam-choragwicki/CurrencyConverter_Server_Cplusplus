@@ -18,13 +18,21 @@ public:
 class CurlManager
 {
 public:
-    static CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
+    explicit CurlManager(const std::string& downloadDirectoryPath);
+
+    CurrencyCodeToCurrencyExchangeRatesJsonMapping downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
 
 private:
-    static std::map<CurrencyCode, CurlEasyHandle> setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);
-    static void startDownload(CURLM* multiHandle);
-    static void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
+    void setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes, std::map<CurrencyCode, std::string>& responsesContents);
+    void startDownload(CURLM* multiHandle);
 
-    inline static bool verbose_{};
-    inline static bool logFileSize_{};
+    void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
+
+    const std::string DOWNLOAD_DIRECTORY_PATH;
+
+    std::map<CurrencyCode, FILE*> currencyCodesToFilesMapping_;
+    std::map<CurrencyCode, CurlEasyHandle> currencyCodesToHandlesMapping_;
+
+    bool verbose_{};
+    bool logFileSize_{};
 };
