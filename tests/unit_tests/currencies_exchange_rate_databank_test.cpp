@@ -12,7 +12,7 @@ protected:
 
 TEST_F(CurrenciesDatabankTest, CurrenciesCount)
 {
-    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 147);
+    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 4);
 }
 
 TEST_F(CurrenciesDatabankTest, AllCombinationsOfExchangeRatesArePresent)

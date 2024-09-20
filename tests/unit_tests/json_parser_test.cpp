@@ -93,7 +93,7 @@ TEST_F(JsonParserTest, ParseCurrenciesListFileContentToCurrenciesCodes)
 
 TEST_F(JsonParserTest, ParseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesDataMapping)
 {
-    std::string currencyExchangeRatesJson = FileLoader::loadFileContent("test_data/jsons/valid_usd.json");
+    std::string currencyExchangeRatesJson = FileLoader::loadFileContent("data/valid_usd.json");
 
     std::set<CurrencyCode> currenciesCodes{CurrencyCode("usd"), CurrencyCode("eur"), CurrencyCode("gbp"), CurrencyCode("pln")};
 

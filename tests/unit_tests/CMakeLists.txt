@@ -16,7 +16,9 @@ set(TEST_SOURCES
         currency_code_test.cpp
         currencies_exchange_rate_databank_test.cpp
         client_socket_handler_test.cpp
-        request_parser_test.cpp downloader_test.cpp)
+        request_parser_test.cpp
+        downloader_test.cpp
+        json_parser_test.cpp)
 
 add_subdirectory(libs/googletest)
 
@@ -24,6 +26,10 @@ add_executable(${PROJECT_NAME}Test_run ${TEST_SOURCES})
 target_include_directories(${PROJECT_NAME}Test_run PUBLIC src)
 target_link_libraries(${PROJECT_NAME}Test_run PUBLIC gtest gmock config converter message_processing socket_communication messages types currencies_exchange_rate_databank)
 
-target_copy_program_data_to_binaries_directory(${PROJECT_NAME}Test_run)
+add_custom_command(TARGET ${PROJECT_NAME}Test_run POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_ROOT}/tests/data ${PROJECT_ROOT}/tests/bin/data
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_ROOT}/data/currencies_exchange_rate_cache ${PROJECT_ROOT}/tests/bin/currencies_exchange_rate_cache)
 
-set_target_properties(${PROJECT_NAME}Test_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT}/bin)
+set_target_properties(${PROJECT_NAME}Test_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT}/tests/bin)

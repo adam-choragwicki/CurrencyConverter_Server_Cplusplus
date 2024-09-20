@@ -3,6 +3,7 @@
 
 .idea
 /bin
+/tests/bin
 cmake-build-*
 executable*
 target*
