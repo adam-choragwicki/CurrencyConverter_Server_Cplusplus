@@ -3,6 +3,7 @@
 #include "types/currency_exchange_rates_json.h"
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
+#include <sstream>
 
 CurlManager::CurlManager(const std::string& downloadDirectoryPath) : DOWNLOAD_DIRECTORY_PATH(downloadDirectoryPath)
 {
@@ -100,16 +101,10 @@ void CurlManager::startDownload(CURLM* multiHandle)
     int handlesStillRunningCount{};
     CURLMsg* message{};
 
-    spdlog::debug("Before perform, Handles still running: " + std::to_string(handlesStillRunningCount));
-
     curl_multi_perform(multiHandle, &handlesStillRunningCount);
-
-    spdlog::debug("After perform, Handles still running: " + std::to_string(handlesStillRunningCount));
 
     while(handlesStillRunningCount)
     {
-        spdlog::debug("Inside loop, Handles still running: " + std::to_string(handlesStillRunningCount));
-
         struct timeval timeout = Utilities::getTimeout(multiHandle);
         int rc = Utilities::waitIfNeeded(multiHandle, timeout);
 
@@ -134,26 +129,14 @@ void CurlManager::startDownload(CURLM* multiHandle)
                     {
                         double fileSize = 0;
                         curl_easy_getinfo(handle, CURLINFO_SIZE_DOWNLOAD, &fileSize);
-                        spdlog::info("Downloaded file size: " + std::to_string(fileSize) + " bytes");
-                    }
 
-                    auto urlContainsCurrency = [](const std::string& url, const CurrencyCode& currencyCode)
-                    {
-                        return url.find(currencyCode.toString()) != std::string::npos;
-                    };
+                        double fileSizeInKB = fileSize / 1024.0;
 
-                    // Find the file corresponding to this URL and close it
-                    for(auto&[currencyCode, file] : currencyCodesToFilesMapping_)
-                    {
-                        if(url && urlContainsCurrency(url, currencyCode))
-                        {
-                            fclose(file);
-                            currencyCodesToFilesMapping_.erase(currencyCode);
+                        std::ostringstream formattedSize;
+                        formattedSize.precision(2);
+                        formattedSize << std::fixed << fileSizeInKB;
 
-                            spdlog::debug("Closed file '{}'", url);
-
-                            break;
-                        }
+                        spdlog::info("Downloaded file size: " + formattedSize.str() + " KB");
                     }
                 }
                 else
@@ -169,15 +152,22 @@ void CurlManager::startDownload(CURLM* multiHandle)
         }
         while(message);
 
-        spdlog::debug("After loop, Handles still running: " + std::to_string(handlesStillRunningCount));
-
         if(rc >= 0)
         {
             curl_multi_perform(multiHandle, &handlesStillRunningCount);
         }
     }
 
-    spdlog::debug("Before exiting function, Handles still running: " + std::to_string(handlesStillRunningCount));
+    if(handlesStillRunningCount > 0)
+    {
+        spdlog::error("Before closing files, Download handles still running: " + std::to_string(handlesStillRunningCount));
+    }
+
+    for(auto&[currencyCode, file] : currencyCodesToFilesMapping_)
+    {
+        fclose(file);
+        spdlog::debug("Closed file for '{}'", currencyCode.toString());
+    }
 
     spdlog::info("Finished downloads");
 }
