@@ -62,7 +62,13 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     spdlog::info("Files requested to download: {}", currenciesCodesOfFilesRequestedToBeDownloaded.size());
     spdlog::info("Files download successfully: {}", currenciesCodesOfSuccessfullyDownloadedFiles_.size());
-    spdlog::info("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
+
+    size_t filesFailedToDownloadCount = errorDescriptionsPerCurrencyCode_.size();
+
+    if(filesFailedToDownloadCount > 0)
+    {
+        spdlog::error("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
+    }
 
     currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
 

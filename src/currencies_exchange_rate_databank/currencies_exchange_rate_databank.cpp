@@ -59,8 +59,6 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
 {
     spdlog::debug("Loading currencies exchange rates from files");
 
-    CurrenciesExchangeRatesCache currenciesExchangeRatesCache;
-
     for(const CurrencyCode& currencyCode : currenciesCodes)
     {
         const std::string filePath = directoryPath + currencyCode.toString() + ".json";
@@ -77,7 +75,7 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
                 {
                     if(!exchangeRateData.isNull())
                     {
-                        currenciesExchangeRatesCache.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
+                        currenciesExchangeRatesCache_.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
                     }
                     else
                     {
@@ -98,8 +96,6 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
         }
     }
 
-    currenciesExchangeRatesCache_ = currenciesExchangeRatesCache;
-
     spdlog::debug("Loading currencies exchange rates from files... DONE");
 }
 
@@ -107,9 +103,7 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
 {
     spdlog::debug("Updating currencies exchange rates from files");
 
-    CurrenciesExchangeRatesCache currenciesExchangeRatesCache;
-
-    for(const CurrencyCode& currencyCode : currenciesCodes_)
+    for(const CurrencyCode& currencyCode : currenciesCodes)
     {
         const std::string filePath = directoryPath + "/" + currencyCode.toString() + ".json";
 
@@ -125,7 +119,7 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
                 {
                     if(!exchangeRateData.isNull())
                     {
-                        currenciesExchangeRatesCache.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
+                        currenciesExchangeRatesCache_.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
                     }
                     else
                     {
@@ -145,8 +139,6 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
             exit(1);
         }
     }
-
-    currenciesExchangeRatesCache_ = currenciesExchangeRatesCache;
 
     spdlog::debug("Updating currencies exchange rates from files... DONE");
 }
