@@ -1,6 +1,5 @@
 #include "curl_manager.h"
 #include "types/currency_code.h"
-#include "types/currency_exchange_rates_json.h"
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
 #include <sstream>
@@ -26,20 +25,17 @@ DownloadReport CurlManager::downloadMultiplexing(const std::set<CurrencyCode>& c
         curl_multi_remove_handle(curlMultiHandle.get(), handle.get());
     }
 
-    CurrencyCodeToCurrencyExchangeRatesJsonMapping currencyCodeToCurrencyExchangeRatesJsonMapping;
-
-    for(const auto&[currencyCode, currencyExchangeRatesJson] : responsesContents)
-    {
-        if(!currencyExchangeRatesJson.empty())
-        {
-
-            currencyCodeToCurrencyExchangeRatesJsonMapping.try_emplace(currencyCode, currencyExchangeRatesJson);
-        }
-        else
-        {
-            spdlog::warn("No data downloaded for " + currencyCode.toUpperCase());
-        }
-    }
+//    for(const auto&[currencyCode, currencyExchangeRatesJson] : responsesContents)
+//    {
+//        if(!currencyExchangeRatesJson.empty())
+//        {
+//            currencyCodeToCurrencyExchangeRatesJsonMapping.try_emplace(currencyCode, currencyExchangeRatesJson);
+//        }
+//        else
+//        {
+//            spdlog::warn("No data downloaded for " + currencyCode.toUpperCase());
+//        }
+//    }
 
     return downloadReport_;
 }

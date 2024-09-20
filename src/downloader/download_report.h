@@ -44,8 +44,6 @@ private:
     int filesDownloadedSuccessfullyCount_;
     int errorsCount_;
 
-    //        std::set<CurrencyCode> invalidData_;
-
     const std::string DOWNLOAD_DIRECTORY_PATH;
 
     std::set<CurrencyCode> currencyCodesOfSuccessfullyDownloadedFiles_;
