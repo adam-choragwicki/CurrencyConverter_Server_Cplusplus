@@ -55,8 +55,8 @@ std::map<CurrencyCode, CurlEasyHandle> CurlManager::setupDownload(const CurlMult
             const std::string url = "https://www.floatrates.com/daily/" + currencyCode.toString() + ".json";
             curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
 
-            const auto&[iter2, _2] = responsesContents.try_emplace(currencyCode, "");
-            Utilities::saveToString(handle, iter2->second);
+            const std::string fileName = "downloaded_data/" + currencyCode.toString() + ".json";
+            Utilities::saveToFile(handle, fileName);
 
             curl_multi_add_handle(curlMultiHandle.get(), handle);
 
@@ -77,12 +77,12 @@ void CurlManager::startDownload(CURLM* multiHandle)
 {
     spdlog::info("Starting downloads");
 
-    int stillRunningHandlesCount{};
+    int handlesStillRunningCount{};
     CURLMsg* message;
 
-    curl_multi_perform(multiHandle, &stillRunningHandlesCount);
+    curl_multi_perform(multiHandle, &handlesStillRunningCount);
 
-    while(stillRunningHandlesCount)
+    while(handlesStillRunningCount)
     {
         struct timeval timeout = Utilities::getTimeout(multiHandle);
         int rc = Utilities::waitIfNeeded(multiHandle, timeout);
@@ -104,9 +104,14 @@ void CurlManager::startDownload(CURLM* multiHandle)
                 {
                     spdlog::info(std::string("Downloaded ") + url);
                 }
-                else if(message->data.result == CURLE_COULDNT_RESOLVE_HOST)
+                else
                 {
-                    throw CurlError("Error, could not resolve host. Probably no internet access");
+                    spdlog::error("Failed to download: " + std::string(url ? url : "unknown URL") + " with error: " + curl_easy_strerror(message->data.result));
+
+                    if(message->data.result == CURLE_COULDNT_RESOLVE_HOST)
+                    {
+                        throw CurlError("Error, could not resolve host. Probably no internet access");
+                    }
                 }
             }
         }
@@ -114,7 +119,7 @@ void CurlManager::startDownload(CURLM* multiHandle)
 
         if(rc >= 0)
         {
-            curl_multi_perform(multiHandle, &stillRunningHandlesCount);
+            curl_multi_perform(multiHandle, &handlesStillRunningCount);
         }
     }
 

@@ -21,4 +21,5 @@ public:
     static int waitIfNeeded(CURLM* multi_handle, timeval& timeout);
 
     static void saveToString(CURL* curl, std::string& currencyExchangeRatesJson);
+    static void saveToFile(CURL* curl, const std::string& filePath);
 };

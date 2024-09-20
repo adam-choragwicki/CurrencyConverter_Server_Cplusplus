@@ -3,6 +3,7 @@
 #include "curl_manager.h"
 #include "curl/curl.h"
 #include "spdlog/spdlog.h"
+#include <filesystem>
 
 DownloadManager::DownloadManager()
 {
@@ -31,6 +32,15 @@ CurrencyCodeToCurrencyExchangeRatesJsonMapping DownloadManager::downloadCurrenci
 {
     try
     {
+        const std::string DOWNLOAD_DIRECTORY_PATH = "downloaded_data";
+
+        if(std::filesystem::exists(DOWNLOAD_DIRECTORY_PATH))
+        {
+            std::filesystem::remove_all(DOWNLOAD_DIRECTORY_PATH);
+        }
+
+        std::filesystem::create_directory(DOWNLOAD_DIRECTORY_PATH);
+
         return CurlManager::downloadMultiplexing(currenciesCodes);
     }
     catch(const CurlError& exception)
