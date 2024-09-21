@@ -18,6 +18,7 @@ set(TEST_SOURCES
         client_socket_handler_test.cpp
         request_parser_test.cpp
         downloader_test.cpp
+        json_validator_test.cpp
         json_parser_test.cpp)
 
 add_subdirectory(libs/googletest)

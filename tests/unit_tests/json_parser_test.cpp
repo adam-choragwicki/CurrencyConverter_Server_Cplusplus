@@ -1,76 +1,12 @@
 #include "common_test_fixture.h"
-#include "json_processing/json_parser.h"
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
-#include "types/containers/exchange_rate_data.h"
 #include "utilities/files_helper.h"
+#include "json_processing/json_parser.h"
 
 class JsonParserTest : public CommonTestFixture
 {
 };
-
-TEST_F(JsonParserTest, EmptyCurlyBraces)
-{
-    std::string emptyJsonString("{}");
-
-    EXPECT_TRUE(JsonParser::isValidJsonString(emptyJsonString));
-}
-
-TEST_F(JsonParserTest, EmptyString)
-{
-    std::string emptyString;
-
-    EXPECT_FALSE(JsonParser::isValidJsonString(emptyString));
-}
-
-TEST_F(JsonParserTest, MalformedString)
-{
-    std::string malformedString("{");
-
-    EXPECT_FALSE(JsonParser::isValidJsonString(malformedString));
-}
-
-TEST_F(JsonParserTest, SimpleKeyValue)
-{
-    std::string jsonString = R"({"key" : "value"})";
-
-    EXPECT_TRUE(JsonParser::isValidJsonString(jsonString));
-}
-
-TEST_F(JsonParserTest, UnquotedKey)
-{
-    std::string jsonString = R"({key : "value"})";
-
-    EXPECT_FALSE(JsonParser::isValidJsonString(jsonString));
-}
-
-TEST_F(JsonParserTest, UnquotedNonStringValue)
-{
-    std::string jsonString = R"({"key" : value})";
-
-    EXPECT_FALSE(JsonParser::isValidJsonString(jsonString));
-}
-
-TEST_F(JsonParserTest, NumericValue)
-{
-    std::string jsonString = R"({"key" : 5})";
-
-    EXPECT_TRUE(JsonParser::isValidJsonString(jsonString));
-}
-
-TEST_F(JsonParserTest, BooleanValueLowerCase)
-{
-    std::string jsonString = R"({"key" : true})";
-
-    EXPECT_TRUE(JsonParser::isValidJsonString(jsonString));
-}
-
-TEST_F(JsonParserTest, BooleanValueUpperCase)
-{
-    std::string jsonString = R"({"key" : True})";
-
-    EXPECT_FALSE(JsonParser::isValidJsonString(jsonString));
-}
 
 TEST_F(JsonParserTest, ParseCurrenciesListFileContentToCurrenciesCodes)
 {
@@ -97,9 +33,9 @@ TEST_F(JsonParserTest, ParseExchangeRatesJsonStringToCurrencyCodesToExchangeRate
 
     std::set<CurrencyCode> currenciesCodes{CurrencyCode("usd"), CurrencyCode("eur"), CurrencyCode("gbp"), CurrencyCode("pln")};
 
-    CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMapForUSD = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(CurrencyCode("usd"),
-                                                                                                                                                                        currenciesCodes,
-                                                                                                                                                                        CurrencyExchangeRatesJson(currencyExchangeRatesJson));
+    ParseResult parseResult = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(CurrencyCode("usd"), currenciesCodes, CurrencyExchangeRatesJson(currencyExchangeRatesJson));
+
+    CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMapForUSD = *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_;
 
     EXPECT_EQ(currencyCodeToExchangeRateDataMapForUSD.size(), 3);
 

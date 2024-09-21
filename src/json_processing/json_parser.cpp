@@ -39,10 +39,10 @@ std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCod
     return currenciesCodes;
 }
 
-CurrencyCodeToCurrencyExchangeRateDataMapping JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
-                                                                                                                          const std::set<CurrencyCode>& currenciesCodes,
-                                                                                                                          const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
-                                                                                                                          bool allKeysExistenceRequired)
+ParseResult JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
+                                                                                             const std::set<CurrencyCode>& currenciesCodes,
+                                                                                             const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
+                                                                                             bool allKeysExistenceRequired)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 
@@ -84,8 +84,15 @@ CurrencyCodeToCurrencyExchangeRateDataMapping JsonParser::parseExchangeRatesJson
                     }
                 }
             }
+            else
+            {
+                spdlog::error("Error, currency '{}' is not present in JSON", currencyCode.toString());
+                return ParseResult(false, std::nullopt);
+            }
         }
     }
 
-    return currencyCodeToExchangeRateDataMap;
+    return ParseResult{true, currencyCodeToExchangeRateDataMap};
+
+    //    return currencyCodeToExchangeRateDataMap;
 }

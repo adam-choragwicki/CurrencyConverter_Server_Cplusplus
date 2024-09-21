@@ -75,7 +75,8 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
 
             if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                ParseResult parseResult = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_;
 
                 for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
                 {
@@ -105,49 +106,49 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
     spdlog::debug("Loading currencies exchange rates from files... DONE");
 }
 
-void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath)
-{
-    spdlog::debug("Updating currencies exchange rates from files");
-
-    for(const CurrencyCode& currencyCode : currenciesCodes)
-    {
-        const std::string filePath = directoryPath + "/" + currencyCode.toString() + ".json";
-
-        if(FilesHelper::fileExists(filePath))
-        {
-            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
-
-            if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
-            {
-                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
-
-                for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
-                {
-                    if(!exchangeRateData.isNull())
-                    {
-                        currenciesExchangeRatesCache_.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
-                    }
-                    else
-                    {
-                        spdlog::error("Wrong new exchange rate data, previous exchange rate will be kept for consistency");
-                    }
-                }
-            }
-            else
-            {
-                spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' is not a valid JSON string");
-                exit(1);
-            }
-        }
-        else
-        {
-            spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' does not exist");
-            exit(1);
-        }
-    }
-
-    spdlog::debug("Updating currencies exchange rates from files... DONE");
-}
+//void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath)
+//{
+//    spdlog::debug("Updating currencies exchange rates from files");
+//
+//    for(const CurrencyCode& currencyCode : currenciesCodes)
+//    {
+//        const std::string filePath = directoryPath + "/" + currencyCode.toString() + ".json";
+//
+//        if(FilesHelper::fileExists(filePath))
+//        {
+//            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
+//
+//            if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
+//            {
+//                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+//
+//                for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
+//                {
+//                    if(!exchangeRateData.isNull())
+//                    {
+//                        currenciesExchangeRatesCache_.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
+//                    }
+//                    else
+//                    {
+//                        spdlog::error("Wrong new exchange rate data, previous exchange rate will be kept for consistency");
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' is not a valid JSON string");
+//                exit(1);
+//            }
+//        }
+//        else
+//        {
+//            spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' does not exist");
+//            exit(1);
+//        }
+//    }
+//
+//    spdlog::debug("Updating currencies exchange rates from files... DONE");
+//}
 
 bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
@@ -157,4 +158,14 @@ bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode
 ExchangeRateData CurrenciesExchangeRateDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
     return currenciesExchangeRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
+}
+
+void CurrenciesExchangeRateDatabank::setExchangeRateDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
+{
+    const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
+
+    if(inserted)
+    {
+        spdlog::error("Error, this should not insert");
+    }
 }

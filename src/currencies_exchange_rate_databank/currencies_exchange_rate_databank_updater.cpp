@@ -15,6 +15,8 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 {
     spdlog::info("Starting currencies exchange rates update");
 
+    Timer timer;
+
     //download
 
     std::unique_ptr<DownloadReport> downloadReport;
@@ -31,6 +33,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     const std::string downloadDirectoryPath = downloadReport->getDownloadDirectoryPath();
 
+    //check which currency files actually exist
     std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
 
     for(const CurrencyCode& currencyCode : currenciesDatabank.getCurrenciesCodes())
@@ -43,24 +46,53 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         }
     }
 
+    //parse currency files
+    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping;
+
     for(const auto&[currencyCode, filePath] : currencyCodeToFilePathMapping)
     {
         std::string fileContent = FilesHelper::loadFileContent(filePath);
 
-        if(JsonValidator::isValidJsonString(fileContent))
-        {
-            JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), CurrencyExchangeRatesJson(fileContent), true);
-        }
+        ParseResult parseResult = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), CurrencyExchangeRatesJson(fileContent));
 
-
+        currencyCodeToParseResultMapping.insert_or_assign(currencyCode, parseResult);
     }
+
+    for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
+    {
+        if(parseResult.isSuccess_)
+        {
+            currenciesDatabank.setExchangeRateDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+        }
+    }
+
+
+
+    //validate existing currency files
+    //    for(const auto&[currencyCode, filePath] : currencyCodeToFilePathMapping)
+    //    {
+    //        std::string fileContent = FilesHelper::loadFileContent(filePath);
+
+    //        CurrencyCodeToCurrencyExchangeRateDataMapping
+
+    //        const CurrencyCode& sourceCurrencyCode,
+    //        const std::set<CurrencyCode>& currenciesCodes,
+    //        const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
+
+
+    //        if(JsonValidator::isValidCurrencyExchangeRatesJson(fileContent, currencyCode, currenciesDatabank.getCurrenciesCodes()))
+    //        {
+    //            JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), CurrencyExchangeRatesJson(fileContent), true);
+    //        }
+
+
+    //    }
 
     //validate
     //parse
 
-    Timer timer;
 
-    CurrencyCodeToCurrencyExchangeRatesJsonMapping currenciesCodesToExchangeRatesJsonsMapping;
+    //    CurrencyCodeToCurrencyExchangeRatesJsonMapping currenciesCodesToExchangeRatesJsonsMapping;
 
 
     //validate
@@ -109,7 +141,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         spdlog::error("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
     }
 
-    currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
+    //    currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
 
     spdlog::info("Cache updated successfully in " + timer.getResult());
 
