@@ -43,7 +43,22 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         return false;
     }
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfDownloadedFiles(currenciesDatabank.getCurrenciesCodes());
+    auto getCurrencyCodeToFilePathMappingOfDownloadedFiles = [](const std::set<CurrencyCode>& currenciesCodes)
+    {
+        std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
+
+        for(const CurrencyCode& currencyCode : currenciesCodes)
+        {
+            const std::string path = CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
+
+            if(FilesHelper::fileExists(path))
+            {
+                currencyCodeToFilePathMapping.insert_or_assign(currencyCode, path);
+            }
+        }
+
+        return currencyCodeToFilePathMapping;
+    };
 
     auto parseDownloadedFiles = [&currenciesDatabank](const std::map<CurrencyCode, std::string>& currencyCodeToFilePathMapping)
     {
@@ -61,7 +76,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         return currencyCodeToParseResultMapping;
     };
 
-    auto updateDatabank = [&currenciesDatabank](const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+    auto updateCacheDatabank = [&currenciesDatabank](const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
     {
         for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
         {
@@ -72,9 +87,9 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         }
     };
 
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfDownloadedFiles(currenciesDatabank.getCurrenciesCodes());
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseDownloadedFiles(currencyCodeToFilePathMapping);
-
-    updateDatabank(currencyCodeToParseResultMapping);
+    updateCacheDatabank(currencyCodeToParseResultMapping);
 
     spdlog::info("Cache updated successfully in " + timer.getResult());
 
@@ -125,21 +140,4 @@ void CurrenciesExchangeRateDatabankUpdater::displayDownloadReportData(const Down
     {
         spdlog::error("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
     }
-}
-
-std::map<CurrencyCode, std::string> CurrenciesExchangeRateDatabankUpdater::getCurrencyCodeToFilePathMappingOfDownloadedFiles(const std::set<CurrencyCode>& currenciesCodes)
-{
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
-
-    for(const CurrencyCode& currencyCode : currenciesCodes)
-    {
-        const std::string path = CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
-
-        if(FilesHelper::fileExists(path))
-        {
-            currencyCodeToFilePathMapping.insert_or_assign(currencyCode, path);
-        }
-    }
-
-    return currencyCodeToFilePathMapping;
 }

@@ -15,8 +15,5 @@ public:
 
 private:
     static void prepareDownloadDirectory();
-
     static void displayDownloadReportData(const DownloadReport& downloadReport);
-
-    static std::map<CurrencyCode, std::string> getCurrencyCodeToFilePathMappingOfDownloadedFiles(const std::set<CurrencyCode>& currenciesCodes);
 };
