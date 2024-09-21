@@ -24,10 +24,9 @@ public:
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
     { return currenciesCodes_; }
 
-    void updateCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
     void loadCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
 
-    void setExchangeRateDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
+    void setAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
 
 private:
     static const std::string& loadCurrenciesListFileContent();

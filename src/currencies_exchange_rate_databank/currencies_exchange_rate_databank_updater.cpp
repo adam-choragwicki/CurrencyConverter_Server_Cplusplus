@@ -11,6 +11,8 @@
 #include "json_processing/json_validator.h"
 #include "config.h"
 
+//TODO add common update failure reason exception?
+
 bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
     spdlog::info("Starting currencies exchange rates update");
@@ -82,7 +84,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         {
             if(parseResult.isSuccess_)
             {
-                currenciesDatabank.setExchangeRateDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+                currenciesDatabank.setAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
             }
         }
     };
