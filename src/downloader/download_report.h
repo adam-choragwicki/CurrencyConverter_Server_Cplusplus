@@ -9,11 +9,6 @@ class DownloadReport
 public:
     explicit DownloadReport(const std::string& downloadDirectoryPath);
 
-    [[nodiscard]] const std::string& getDownloadDirectoryPath() const
-    {
-        return DOWNLOAD_DIRECTORY_PATH;
-    }
-
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodesOfFilesRequestedToBeDownloaded() const
     {
         return currenciesCodesOfFilesRequestedToBeDownloaded_;
@@ -63,8 +58,6 @@ public:
     }
 
 private:
-    const std::string DOWNLOAD_DIRECTORY_PATH;
-
     std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded_;
     std::set<CurrencyCode> currencyCodesOfSuccessfullyDownloadedFiles_;
     std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_;

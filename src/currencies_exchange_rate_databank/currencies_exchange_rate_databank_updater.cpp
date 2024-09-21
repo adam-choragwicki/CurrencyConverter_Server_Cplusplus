@@ -4,12 +4,12 @@
 #include "downloader/download_manager.h"
 #include "spdlog/spdlog.h"
 #include "types/currency_code.h"
-#include "types/definitions.h"
 #include "types/currency_exchange_rates_json.h"
 #include "downloader/download_report.h"
 #include "utilities/files_helper.h"
 #include "json_processing/json_parser.h"
 #include "json_processing/json_validator.h"
+#include "config.h"
 
 bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
@@ -17,36 +17,54 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     Timer timer;
 
-    //download
+    //prepare download directory
+    if(std::filesystem::exists(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH))
+    {
+        std::filesystem::remove_all(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+    }
 
+    std::filesystem::create_directory(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+    //end prepare download directory
+
+    //download
     std::unique_ptr<DownloadReport> downloadReport;
 
     try
     {
-        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(currenciesDatabank.getCurrenciesCodes()));
+        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesDatabank.getCurrenciesCodes()));
     }
     catch(const DownloadError& exception)
     {
         spdlog::error(exception.what() + std::string(".\nCache update aborted"));
         return false;
     }
+    //end download
 
-    const std::string downloadDirectoryPath = downloadReport->getDownloadDirectoryPath();
+    displayDownloadReportData(*downloadReport);
 
-    //check which currency files actually exist
+    const size_t successfullyDownloadedFilesCount = downloadReport->getCurrencyCodesOfSuccessfullyDownloadedFiles().size();
+
+    if(successfullyDownloadedFilesCount == 0)
+    {
+        spdlog::error("Error, no successfully downloaded currencies exchange rates files\nCache update aborted");
+        return false;
+    }
+
+    //check which currency files got downloaded
     std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
 
     for(const CurrencyCode& currencyCode : currenciesDatabank.getCurrenciesCodes())
     {
-        const std::string path = downloadDirectoryPath + "/" + currencyCode.toString() + ".json";
+        const std::string path = CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
 
         if(FilesHelper::fileExists(path))
         {
             currencyCodeToFilePathMapping.insert_or_assign(currencyCode, path);
         }
     }
+    //end check which currency files got downloaded
 
-    //parse currency files
+    //parse only existing currency files
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping;
 
     for(const auto&[currencyCode, filePath] : currencyCodeToFilePathMapping)
@@ -57,7 +75,9 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
         currencyCodeToParseResultMapping.insert_or_assign(currencyCode, parseResult);
     }
+    //end parse only existing currency files
 
+    //actual update of databank
     for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
     {
         if(parseResult.isSuccess_)
@@ -65,58 +85,23 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
             currenciesDatabank.setExchangeRateDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
         }
     }
+    //end actual update of databank
 
 
+    spdlog::info("Cache updated successfully in " + timer.getResult());
 
-    //validate existing currency files
-    //    for(const auto&[currencyCode, filePath] : currencyCodeToFilePathMapping)
-    //    {
-    //        std::string fileContent = FilesHelper::loadFileContent(filePath);
+    return true;
+}
 
-    //        CurrencyCodeToCurrencyExchangeRateDataMapping
-
-    //        const CurrencyCode& sourceCurrencyCode,
-    //        const std::set<CurrencyCode>& currenciesCodes,
-    //        const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
-
-
-    //        if(JsonValidator::isValidCurrencyExchangeRatesJson(fileContent, currencyCode, currenciesDatabank.getCurrenciesCodes()))
-    //        {
-    //            JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), CurrencyExchangeRatesJson(fileContent), true);
-    //        }
-
-
-    //    }
-
-    //validate
-    //parse
-
-
-    //    CurrencyCodeToCurrencyExchangeRatesJsonMapping currenciesCodesToExchangeRatesJsonsMapping;
-
-
-    //validate
-
-    //    for(const auto&[currencyCode, currencyRateExchangeJson] : currenciesCodesToExchangeRatesJsonsMapping)
-    //    {
-    //        if(JsonReader::isValidJson(currencyRateExchangeJson.toString()))
-    //        {
-    //            currenciesDatabank.setExchangeRate(currencyCode, currencyRateExchangeJson);
-    //        }
-    //    }
-
-    //    CurrencyCodeToCurrencyExchangeRatesJsonMappingValidator currenciesCodesToExchangeRatesJsonsMappingValidator;
-
-
-
-    std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded = downloadReport->getCurrenciesCodesOfFilesRequestedToBeDownloaded();
-    std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport->getCurrencyCodesOfSuccessfullyDownloadedFiles();
-    std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_ = downloadReport->getErrorDescriptionsPerCurrencyCode();
+void CurrenciesExchangeRateDatabankUpdater::displayDownloadReportData(const DownloadReport& downloadReport)
+{
+    std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded = downloadReport.getCurrenciesCodesOfFilesRequestedToBeDownloaded();
+    std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport.getCurrencyCodesOfSuccessfullyDownloadedFiles();
+    std::multimap<CurrencyCode, std::string> errorDescriptionsPerCurrencyCode_ = downloadReport.getErrorDescriptionsPerCurrencyCode();
 
     if(currenciesCodesOfSuccessfullyDownloadedFiles_.empty())
     {
-        spdlog::error("Error, no successfully downloaded currencies exchange rates files\nCache update aborted");
-        return false;
+        spdlog::error("Error, no successfully downloaded currencies exchange rates files");
     }
 
     size_t filesRequestedToBeDownloadedCount = currenciesCodesOfFilesRequestedToBeDownloaded.size();
@@ -140,10 +125,4 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
     {
         spdlog::error("Files failed to download: {}", errorDescriptionsPerCurrencyCode_.size());
     }
-
-    //    currenciesDatabank.updateCurrenciesExchangeRatesCacheFromFiles(currenciesCodesOfSuccessfullyDownloadedFiles_, downloadDirectoryPath);
-
-    spdlog::info("Cache updated successfully in " + timer.getResult());
-
-    return true;
 }

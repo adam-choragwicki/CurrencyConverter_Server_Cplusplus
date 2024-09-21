@@ -25,7 +25,7 @@ public:
     DownloadManager& operator=(DownloadManager&&) = delete;
     ~DownloadManager();
 
-    DownloadReport downloadCurrenciesExchangeRatesFiles(const std::set<CurrencyCode>& currenciesCodes);
+    DownloadReport downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath, const std::set<CurrencyCode>& currenciesCodes);
 
 private:
     inline static bool alreadyCreated_{};

@@ -4,7 +4,6 @@
 #include "curl/curl.h"
 #include "download_report.h"
 #include "spdlog/spdlog.h"
-#include <filesystem>
 
 DownloadManager::DownloadManager()
 {
@@ -31,21 +30,11 @@ DownloadManager::~DownloadManager()
     alreadyCreated_ = false;
 }
 
-DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::set<CurrencyCode>& currenciesCodes)
+DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath, const std::set<CurrencyCode>& currenciesCodes)
 {
     try
     {
-        const std::string DOWNLOAD_DIRECTORY_PATH = "downloaded_data";
-
-        if(std::filesystem::exists(DOWNLOAD_DIRECTORY_PATH))
-        {
-            std::filesystem::remove_all(DOWNLOAD_DIRECTORY_PATH);
-        }
-
-        std::filesystem::create_directory(DOWNLOAD_DIRECTORY_PATH);
-
-        CurlManager curlManager(DOWNLOAD_DIRECTORY_PATH);
-
+        CurlManager curlManager(downloadDirectoryPath);
         return curlManager.downloadMultiplexing(currenciesCodes);
     }
     catch(const CurlError& exception)
