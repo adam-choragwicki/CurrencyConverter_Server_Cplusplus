@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "json_processing/json_reader.h"
-#include "utilities/file_loader.h"
+#include "utilities/files_helper.h"
 #include <string>
 
 class ConfigLoader

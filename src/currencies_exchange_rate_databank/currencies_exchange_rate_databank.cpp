@@ -1,6 +1,7 @@
 #include "currencies_exchange_rate_databank.h"
+#include "json_processing/json_validator.h"
 #include "json_processing/json_parser.h"
-#include "utilities/file_loader.h"
+#include "utilities/files_helper.h"
 #include "config.h"
 #include "spdlog/spdlog.h"
 #include "types/currency_code.h"
@@ -12,7 +13,7 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesLis
     if(!alreadyCreated_)
     {
         //TODO parse only once
-        if(JsonParser::isValidJsonString(currenciesListFileContent_))
+        if(JsonValidator::isValidJsonString(currenciesListFileContent_))
         {
             try
             {
@@ -48,9 +49,9 @@ CurrenciesExchangeRateDatabank::~CurrenciesExchangeRateDatabank()
 
 const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent()
 {
-    if(FileLoader::fileExists(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
+    if(FilesHelper::fileExists(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
     {
-        static const std::string fileContent = FileLoader::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+        static const std::string fileContent = FilesHelper::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
         return fileContent;
     }
     else
@@ -68,13 +69,13 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
     {
         const std::string filePath = directoryPath + currencyCode.toString() + ".json";
 
-        if(FileLoader::fileExists(filePath))
+        if(FilesHelper::fileExists(filePath))
         {
-            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FileLoader::loadFileContent(filePath));
+            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
 
             if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
                 for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
                 {
@@ -112,13 +113,13 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
     {
         const std::string filePath = directoryPath + "/" + currencyCode.toString() + ".json";
 
-        if(FileLoader::fileExists(filePath))
+        if(FilesHelper::fileExists(filePath))
         {
-            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FileLoader::loadFileContent(filePath));
+            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
 
             if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
-                const std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
+                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
                 for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
                 {

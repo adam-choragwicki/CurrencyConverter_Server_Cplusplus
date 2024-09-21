@@ -1,5 +1,5 @@
 set(SOURCE_FILES
-        file_loader.h
+        files_helper.h
         timer.h timer.cpp
         unique_id_generator.h)
 

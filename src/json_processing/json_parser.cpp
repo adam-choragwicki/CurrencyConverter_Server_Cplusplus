@@ -6,6 +6,7 @@
 #include "types/currency_exchange_rates_json.h"
 #include "json_processing/exceptions.h"
 #include "spdlog/spdlog.h"
+#include "types/definitions.h"
 
 std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string)
 {
@@ -38,14 +39,14 @@ std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCod
     return currenciesCodes;
 }
 
-std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
+CurrencyCodeToCurrencyExchangeRateDataMapping JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
                                                                                                                           const std::set<CurrencyCode>& currenciesCodes,
                                                                                                                           const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
                                                                                                                           bool allKeysExistenceRequired)
 {
     JsonReader jsonReader(currencyExchangeRatesJson.toString());
 
-    std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMap;
+    CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap;
 
     for(const CurrencyCode& currencyCode : currenciesCodes)
     {
@@ -87,10 +88,4 @@ std::map<CurrencyCode, ExchangeRateData> JsonParser::parseExchangeRatesJsonStrin
     }
 
     return currencyCodeToExchangeRateDataMap;
-}
-
-bool JsonParser::isValidJsonString(const std::string& string)
-{
-    rapidjson::Document document;
-    return !document.Parse(string.c_str()).HasParseError();
 }

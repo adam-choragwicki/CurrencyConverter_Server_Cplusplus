@@ -3,7 +3,7 @@
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
 #include "types/containers/exchange_rate_data.h"
-#include "utilities/file_loader.h"
+#include "utilities/files_helper.h"
 
 class JsonParserTest : public CommonTestFixture
 {
@@ -93,11 +93,11 @@ TEST_F(JsonParserTest, ParseCurrenciesListFileContentToCurrenciesCodes)
 
 TEST_F(JsonParserTest, ParseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesDataMapping)
 {
-    std::string currencyExchangeRatesJson = FileLoader::loadFileContent("data/valid_usd.json");
+    std::string currencyExchangeRatesJson = FilesHelper::loadFileContent("data/valid_usd.json");
 
     std::set<CurrencyCode> currenciesCodes{CurrencyCode("usd"), CurrencyCode("eur"), CurrencyCode("gbp"), CurrencyCode("pln")};
 
-    std::map<CurrencyCode, ExchangeRateData> currencyCodeToExchangeRateDataMapForUSD = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(CurrencyCode("usd"),
+    CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMapForUSD = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(CurrencyCode("usd"),
                                                                                                                                                                         currenciesCodes,
                                                                                                                                                                         CurrencyExchangeRatesJson(currencyExchangeRatesJson));
 

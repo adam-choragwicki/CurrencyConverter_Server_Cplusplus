@@ -1,11 +1,13 @@
 #pragma once
 
 #include <fstream>
+#include <filesystem>
+#include "spdlog/spdlog.h"
 
-class FileLoader
+class FilesHelper
 {
 public:
-    FileLoader() = delete;
+    FilesHelper() = delete;
 
     static std::string loadFileContent(const std::string& path)
     {
@@ -33,7 +35,14 @@ public:
 
     static bool fileExists(const std::string& path)
     {
-        std::ifstream inputFile(path);
-        return inputFile.good();
+        if(std::filesystem::is_regular_file(path))
+        {
+            return true;
+        }
+        else
+        {
+            spdlog::error("Path '{}' is not a file or it does not exist", path);
+            return false;
+        }
     }
 };

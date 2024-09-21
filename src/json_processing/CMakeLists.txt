@@ -3,6 +3,7 @@ set(SOURCE_FILES
         json_reader.h json_reader.cpp
         json_writer.h json_writer.cpp
         json_processing_config.h
+        json_validator.cpp json_validator.h
         exceptions.h)
 
 add_library(json_processing ${SOURCE_FILES})

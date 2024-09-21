@@ -2,7 +2,7 @@
 
 Config ConfigLoader::readConfigFile(const std::string& path)
 {
-    std::string fileContent = FileLoader::loadFileContent(path);
+    std::string fileContent = FilesHelper::loadFileContent(path);
 
     JsonReader jsonReader(fileContent);
 
