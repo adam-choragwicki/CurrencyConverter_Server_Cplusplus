@@ -73,7 +73,7 @@ void CurrenciesExchangeRateDatabank::loadCurrenciesExchangeRatesCacheFromFiles(c
         {
             const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
 
-            if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
+            if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
                 const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 
@@ -117,7 +117,7 @@ void CurrenciesExchangeRateDatabank::updateCurrenciesExchangeRatesCacheFromFiles
         {
             const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
 
-            if(JsonParser::isValidJsonString(currencyExchangeRatesJson.toString()))
+            if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
             {
                 const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
 

@@ -47,9 +47,10 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
     {
         std::string fileContent = FilesHelper::loadFileContent(filePath);
 
-        if(JsonValidator::isValidJsonString(currencyExchangeRatesJson))
-
-        JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), currencyExchangeRatesJson, true);
+        if(JsonValidator::isValidJsonString(fileContent))
+        {
+            JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesDatabank.getCurrenciesCodes(), CurrencyExchangeRatesJson(fileContent), true);
+        }
 
 
     }
