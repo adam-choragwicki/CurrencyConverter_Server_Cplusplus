@@ -9,5 +9,5 @@ class CurrenciesExchangeRateDatabank;
 class CurrenciesExchangeRateDatabankLoader
 {
 public:
-    static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
+    static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath);
 };

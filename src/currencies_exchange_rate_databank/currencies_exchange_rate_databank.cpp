@@ -16,7 +16,7 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string
             currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
 
             //initializeCache
-            CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(*this, currenciesCodes_, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
+            CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
         }
         catch(JsonParseError& jsonParseError)
         {
