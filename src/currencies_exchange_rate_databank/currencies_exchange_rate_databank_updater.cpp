@@ -9,7 +9,7 @@
 #include "utilities/files_helper.h"
 #include "json_processing/json_parser.h"
 #include "json_processing/json_validator.h"
-#include "config.h"
+#include "config/config.h"
 
 //TODO add common update failure reason exception?
 
@@ -26,7 +26,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     try
     {
-        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesDatabank.getCurrenciesCodes()));
+        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesDatabank.getCurrenciesCodes()));
     }
     catch(const DownloadError& exception)
     {
@@ -51,7 +51,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
         for(const CurrencyCode& currencyCode : currenciesCodes)
         {
-            const std::string path = CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
+            const std::string path = Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
 
             if(FilesHelper::fileExists(path))
             {
@@ -102,12 +102,12 @@ void CurrenciesExchangeRateDatabankUpdater::prepareDownloadDirectory()
 {
     //TODO add error handling
 
-    if(std::filesystem::exists(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH))
+    if(std::filesystem::exists(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH))
     {
-        std::filesystem::remove_all(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+        std::filesystem::remove_all(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
     }
 
-    std::filesystem::create_directory(CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+    std::filesystem::create_directory(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
 }
 
 void CurrenciesExchangeRateDatabankUpdater::displayDownloadReportData(const DownloadReport& downloadReport)

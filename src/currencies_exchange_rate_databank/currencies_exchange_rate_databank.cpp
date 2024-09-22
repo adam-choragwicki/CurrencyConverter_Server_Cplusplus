@@ -2,13 +2,13 @@
 #include "json_processing/json_validator.h"
 #include "json_processing/json_parser.h"
 #include "utilities/files_helper.h"
-#include "config.h"
 #include "spdlog/spdlog.h"
 #include "types/currency_code.h"
 #include "types/currency_exchange_rates_json.h"
 #include "json_processing/exceptions.h"
+#include "config/config.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesListFileContent_(loadCurrenciesListFileContent())
+CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath) : currenciesListFileContent_(loadCurrenciesListFileContent(currenciesListFilepath))
 {
     if(!alreadyCreated_)
     {
@@ -18,17 +18,17 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank() : currenciesLis
             try
             {
                 currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
-                loadCurrenciesExchangeRatesCacheFromFiles(currenciesCodes_, CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
+                loadCurrenciesExchangeRatesCacheFromFiles(currenciesCodes_, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
             }
             catch(JsonParseError& jsonParseError)
             {
-                spdlog::critical("Error while processing content of '{}', {}", CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH, jsonParseError.what());
+                spdlog::critical("Error while processing content of '{}', {}", currenciesListFilepath, jsonParseError.what());
                 exit(1);
             }
         }
         else
         {
-            spdlog::critical(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + " is not a valid JSON string");
+            spdlog::critical(currenciesListFilepath + " is not a valid JSON string");
             exit(1);
         }
 
@@ -47,16 +47,16 @@ CurrenciesExchangeRateDatabank::~CurrenciesExchangeRateDatabank()
     alreadyCreated_ = false;
 }
 
-const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent()
+const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent(const std::string& currenciesListFilepath)
 {
-    if(FilesHelper::fileExists(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
+    if(FilesHelper::fileExists(currenciesListFilepath))
     {
-        static const std::string fileContent = FilesHelper::loadFileContent(CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+        static const std::string fileContent = FilesHelper::loadFileContent(currenciesListFilepath);
         return fileContent;
     }
     else
     {
-        spdlog::critical("File '" + CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + "' does not exist");
+        spdlog::critical("File '" + currenciesListFilepath + "' does not exist");
         exit(1);
     }
 }

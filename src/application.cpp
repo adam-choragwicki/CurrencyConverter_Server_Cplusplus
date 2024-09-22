@@ -8,7 +8,7 @@
 #include "messages/responses/calculate_exchange_response.h"
 #include "messages/responses/update_cache_response.h"
 
-#include "config/config_loader.h"
+#include "config/config.h"
 #include "spdlog/spdlog.h"
 #include <iostream>
 
@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 Application::Application(const Config& config) : config_(config)
 {
     connectionManager_ = std::make_unique<ConnectionManager>(config_);
-    currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>();
+    currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
     downloadManager_ = std::make_unique<DownloadManager>();
 
     spdlog::debug("Currency converter server initialized, listening on port " + std::to_string(config_.getPort()));
