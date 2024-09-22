@@ -1,5 +1,4 @@
 #include "currencies_exchange_rate_databank.h"
-#include "json_processing/json_validator.h"
 #include "json_processing/json_parser.h"
 #include "utilities/files_helper.h"
 #include "types/currency_code.h"
@@ -12,25 +11,16 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string
 {
     if(!alreadyCreated_)
     {
-        //TODO parse only once
-        if(JsonValidator::isValidJsonString(currenciesListFileContent_))
+        try
         {
-            try
-            {
-                currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
+            currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
 
-                //initializeCache
-                CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(*this, currenciesCodes_, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
-            }
-            catch(JsonParseError& jsonParseError)
-            {
-                spdlog::critical("Error while processing content of '{}', {}", currenciesListFilepath, jsonParseError.what());
-                exit(1);
-            }
+            //initializeCache
+            CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(*this, currenciesCodes_, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
         }
-        else
+        catch(JsonParseError& jsonParseError)
         {
-            spdlog::critical(currenciesListFilepath + " is not a valid JSON string");
+            spdlog::critical("Error while processing content of '{}', {}", currenciesListFilepath, jsonParseError.what());
             exit(1);
         }
 
