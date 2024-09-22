@@ -7,7 +7,7 @@
 class CurrenciesExchangeRateDatabank
 {
 public:
-    CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath);
+    explicit CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath);
     ~CurrenciesExchangeRateDatabank();
 
     CurrenciesExchangeRateDatabank(const CurrenciesExchangeRateDatabank&) = delete;
@@ -25,6 +25,8 @@ public:
     { return currenciesCodes_; }
 
     void loadCurrenciesExchangeRatesCacheFromFiles(const std::set<CurrencyCode>& currenciesCodes, const std::string& directoryPath);
+
+    void insertAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
 
     void setAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
 

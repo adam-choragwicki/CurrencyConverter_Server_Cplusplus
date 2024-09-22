@@ -45,7 +45,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         return false;
     }
 
-    auto getCurrencyCodeToFilePathMappingOfDownloadedFiles = [](const std::set<CurrencyCode>& currenciesCodes)
+    auto getCurrencyCodeToFilePathMappingOfDownloadedFiles = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
     {
         std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
 
@@ -89,7 +89,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         }
     };
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfDownloadedFiles(currenciesDatabank.getCurrenciesCodes());
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfDownloadedFiles(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesDatabank.getCurrenciesCodes());
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseDownloadedFiles(currencyCodeToFilePathMapping);
     updateCacheDatabank(currencyCodeToParseResultMapping);
 
