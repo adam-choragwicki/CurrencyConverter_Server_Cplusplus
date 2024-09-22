@@ -10,11 +10,11 @@
 
 void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath)
 {
-    const std::set<CurrencyCode>& currenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
+    const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
 
-    spdlog::info("Loading exchange rates data for {} currencies", currenciesCodes.size());
+    spdlog::info("Loading exchange rates data for {} currencies", allCurrenciesCodes.size());
 
-    auto getCurrencyCodeToFilePathMappingOfFiles = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
+    auto getCurrencyCodeToFilePathMapping = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
     {
         std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
 
@@ -31,7 +31,7 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
         return currencyCodeToFilePathMapping;
     };
 
-    auto parseFiles = [&currenciesCodes](const std::map<CurrencyCode, std::string>& currencyCodeToFilePathMapping)
+    auto parseFiles = [](const std::set<CurrencyCode>& currenciesCodes, const std::map<CurrencyCode, std::string>& currencyCodeToFilePathMapping)
     {
         std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping;
 
@@ -47,7 +47,7 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
         return currencyCodeToParseResultMapping;
     };
 
-    auto loadDatabank = [&currenciesExchangeRateDatabank](const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+    auto loadDatabank = [](CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
     {
         for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
         {
@@ -58,9 +58,9 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
         }
     };
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfFiles(directoryPath, currenciesCodes);
-    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseFiles(currencyCodeToFilePathMapping);
-    loadDatabank(currencyCodeToParseResultMapping);
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
+    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
+    loadDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
 
     spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRateDatabank.size());
 }
