@@ -51,7 +51,7 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
         for(const CurrencyCode& currencyCode : currenciesCodes)
         {
-            const std::string path = Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
+            const std::string path = directoryPath + "/" + currencyCode.toString() + ".json";
 
             if(FilesHelper::fileExists(path))
             {

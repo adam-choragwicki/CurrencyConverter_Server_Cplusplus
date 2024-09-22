@@ -1,5 +1,6 @@
 #include "common_test_fixture.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
+#include "types/currency_code.h"
 
 class CurrenciesDatabankTest : public CommonTestFixture
 {

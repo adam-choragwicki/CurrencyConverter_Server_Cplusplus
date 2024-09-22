@@ -12,13 +12,13 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
 {
     spdlog::info("Loading exchange rates data for {} currencies", currenciesCodes.size());
 
-    auto getCurrencyCodeToFilePathMappingOfDownloadedFiles = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
+    auto getCurrencyCodeToFilePathMappingOfFiles = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
     {
         std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
 
         for(const CurrencyCode& currencyCode : currenciesCodes)
         {
-            const std::string path = Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH + "/" + currencyCode.toString() + ".json";
+            const std::string path = directoryPath + "/" + currencyCode.toString() + ".json";
 
             if(FilesHelper::fileExists(path))
             {
@@ -56,7 +56,7 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
         }
     };
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfDownloadedFiles(directoryPath, currenciesCodes);
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMappingOfFiles(directoryPath, currenciesCodes);
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseFiles(currencyCodeToFilePathMapping);
     loadDatabank(currencyCodeToParseResultMapping);
 

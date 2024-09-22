@@ -44,6 +44,7 @@ const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent
     if(FilesHelper::fileExists(currenciesListFilepath))
     {
         static const std::string fileContent = FilesHelper::loadFileContent(currenciesListFilepath);
+        spdlog::info("Loading '{}'", currenciesListFilepath);
         return fileContent;
     }
     else
