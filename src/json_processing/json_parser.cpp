@@ -93,6 +93,4 @@ ParseResult JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRat
     }
 
     return ParseResult{true, currencyCodeToExchangeRateDataMap};
-
-    //    return currencyCodeToExchangeRateDataMap;
 }

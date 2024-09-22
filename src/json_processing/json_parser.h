@@ -13,7 +13,7 @@ class CurrencyExchangeRatesJson;
 
 struct ParseResult
 {
-    bool isSuccess_;
+    bool isSuccess_{};
     std::optional<CurrencyCodeToCurrencyExchangeRateDataMapping> currencyCodeToCurrencyExchangeRateDataMapping_;
 };
 
