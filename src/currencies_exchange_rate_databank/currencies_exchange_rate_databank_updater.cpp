@@ -4,12 +4,12 @@
 #include "downloader/download_manager.h"
 #include "spdlog/spdlog.h"
 #include "types/currency_code.h"
-#include "types/currency_exchange_rates_json.h"
 #include "downloader/download_report.h"
 #include "utilities/files_helper.h"
 #include "json_processing/json_parser.h"
 #include "json_processing/json_validator.h"
 #include "config/config.h"
+#include "utilities.h"
 
 //TODO add common update failure reason exception?
 
@@ -45,39 +45,6 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
         return false;
     }
 
-    auto getCurrencyCodeToFilePathMapping = [](const std::string& directoryPath, const std::set<CurrencyCode>& currenciesCodes)
-    {
-        std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping;
-
-        for(const CurrencyCode& currencyCode : currenciesCodes)
-        {
-            const std::string path = directoryPath + "/" + currencyCode.toString() + ".json";
-
-            if(FilesHelper::fileExists(path))
-            {
-                currencyCodeToFilePathMapping.insert_or_assign(currencyCode, path);
-            }
-        }
-
-        return currencyCodeToFilePathMapping;
-    };
-
-    auto parseFiles = [](const std::set<CurrencyCode>& currenciesCodes, const std::map<CurrencyCode, std::string>& currencyCodeToFilePathMapping)
-    {
-        std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping;
-
-        for(const auto&[currencyCode, filePath] : currencyCodeToFilePathMapping)
-        {
-            std::string fileContent = FilesHelper::loadFileContent(filePath);
-
-            ParseResult parseResult = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes, CurrencyExchangeRatesJson(fileContent));
-
-            currencyCodeToParseResultMapping.insert_or_assign(currencyCode, parseResult);
-        }
-
-        return currencyCodeToParseResultMapping;
-    };
-
     auto updateDatabank = [](CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
     {
         for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
@@ -91,8 +58,8 @@ bool CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(CurrenciesExchangeR
 
     const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = getCurrencyCodeToFilePathMapping(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRateDatabank.getCurrenciesCodes());
-    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRateDatabank.getCurrenciesCodes());
+    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
     updateDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
 
     spdlog::info("Cache updated successfully in " + timer.getResult());
