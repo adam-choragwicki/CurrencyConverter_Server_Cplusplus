@@ -7,7 +7,7 @@ public:
     CurrenciesDatabankTest() = default;
 
 protected:
-    CurrenciesExchangeRateDatabank currenciesDatabank_;
+    CurrenciesExchangeRateDatabank currenciesDatabank_{"data/currencies_list.json"};
 };
 
 TEST_F(CurrenciesDatabankTest, CurrenciesCount)
