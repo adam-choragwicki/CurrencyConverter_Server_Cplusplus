@@ -13,22 +13,24 @@ protected:
 
 TEST_F(CurrenciesDatabankTest, CurrenciesCount)
 {
-    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 4);
+    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 3);
 }
 
 TEST_F(CurrenciesDatabankTest, AllCombinationsOfExchangeRatesArePresent)
 {
-    const auto sourceCurrencyCodes = currenciesDatabank_.getCurrenciesCodes();
-    const auto targetCurrencyCodes = currenciesDatabank_.getCurrenciesCodes();
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("gbp")));
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("usd")));
 
-    for(const CurrencyCode& sourceCurrencyCode : sourceCurrencyCodes)
-    {
-        for(const CurrencyCode& targetCurrencyCode : targetCurrencyCodes)
-        {
-            if(sourceCurrencyCode != targetCurrencyCode)
-            {
-                EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(sourceCurrencyCode, targetCurrencyCode));
-            }
-        }
-    }
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("eur")));
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("usd")));
+
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("eur")));
+    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("gbp")));
+}
+
+TEST_F(CurrenciesDatabankTest, XToXExchangeRatesAreNotPresent)
+{
+    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("eur")));
+    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("gbp")));
+    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("usd")));
 }
