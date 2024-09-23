@@ -4,36 +4,36 @@
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_modifier.h"
 #include "stubs/currencies_list_file_content_stub.h"
 
-class CurrenciesExchangeRateDatabankUpdaterTest : public CommonTestFixture
+class CurrenciesExchangeRatesDatabankUpdaterTest : public CommonTestFixture
 {
 public:
-    CurrenciesExchangeRateDatabankUpdaterTest() = default;
+    CurrenciesExchangeRatesDatabankUpdaterTest() = default;
 
 protected:
-    CurrenciesExchangeRateDatabank currenciesDatabank_{CurrenciesListFileContentStub::getValue()};
+    CurrenciesExchangeRatesDatabank currenciesExchangeRatesDatabank_{CurrenciesListFileContentStub::getValue()};
 };
 
-TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, CurrenciesCount)
+TEST_F(CurrenciesExchangeRatesDatabankUpdaterTest, CurrenciesCount)
 {
-    CurrenciesExchangeRateDatabankModifier currenciesExchangeRateDatabankUpdater;
-    EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 3);
+    CurrenciesExchangeRatesDatabankModifier currenciesExchangeRatesDatabankUpdater;
+    EXPECT_EQ(currenciesExchangeRatesDatabank_.getCurrenciesCodes().size(), 3);
 }
 
-TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, AllCombinationsOfExchangeRatesArePresent)
+TEST_F(CurrenciesExchangeRatesDatabankUpdaterTest, AllCombinationsOfExchangeRatesArePresent)
 {
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("gbp")));
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("usd")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("gbp")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("usd")));
 
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("eur")));
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("usd")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("eur")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("usd")));
 
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("eur")));
-    EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("gbp")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("eur")));
+    EXPECT_TRUE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("gbp")));
 }
 
-TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, XToXExchangeRatesAreNotPresent)
+TEST_F(CurrenciesExchangeRatesDatabankUpdaterTest, XToXExchangeRatesAreNotPresent)
 {
-    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("eur")));
-    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("gbp")));
-    EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("usd")));
+    EXPECT_FALSE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("eur")));
+    EXPECT_FALSE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("gbp")));
+    EXPECT_FALSE(currenciesExchangeRatesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("usd")));
 }

@@ -30,7 +30,7 @@ private:
 
     const Config config_;
     std::unique_ptr<ConnectionManager> connectionManager_;
-    std::unique_ptr<CurrenciesExchangeRateDatabank> currenciesExchangeRateDatabank_;
+    std::unique_ptr<CurrenciesExchangeRatesDatabank> currenciesExchangeRatesDatabank_;
     std::unique_ptr<DownloadManager> downloadManager_;
     std::unique_ptr<InboundMessageQueue> inboundMessageQueue_;
 

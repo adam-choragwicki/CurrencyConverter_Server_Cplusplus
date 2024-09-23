@@ -6,16 +6,16 @@
 class CurrencyCode;
 class CurrenciesListFileContent;
 
-class CurrenciesExchangeRateDatabank
+class CurrenciesExchangeRatesDatabank
 {
 public:
-    explicit CurrenciesExchangeRateDatabank(const CurrenciesListFileContent& currenciesListFileContent);
-    ~CurrenciesExchangeRateDatabank();
+    explicit CurrenciesExchangeRatesDatabank(const CurrenciesListFileContent& currenciesListFileContent);
+    ~CurrenciesExchangeRatesDatabank();
 
-    CurrenciesExchangeRateDatabank(const CurrenciesExchangeRateDatabank&) = delete;
-    CurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank&&) = delete;
-    CurrenciesExchangeRateDatabank& operator=(const CurrenciesExchangeRateDatabank&) = delete;
-    CurrenciesExchangeRateDatabank& operator=(CurrenciesExchangeRateDatabank&&) = delete;
+    CurrenciesExchangeRatesDatabank(const CurrenciesExchangeRatesDatabank&) = delete;
+    CurrenciesExchangeRatesDatabank(CurrenciesExchangeRatesDatabank&&) = delete;
+    CurrenciesExchangeRatesDatabank& operator=(const CurrenciesExchangeRatesDatabank&) = delete;
+    CurrenciesExchangeRatesDatabank& operator=(CurrenciesExchangeRatesDatabank&&) = delete;
 
     [[nodiscard]] bool containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
     [[nodiscard]] ExchangeRateData getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;

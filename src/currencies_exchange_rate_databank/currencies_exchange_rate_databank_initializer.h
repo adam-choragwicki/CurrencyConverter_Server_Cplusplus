@@ -5,12 +5,12 @@
 #include <map>
 
 class CurrencyCode;
-class CurrenciesExchangeRateDatabank;
+class CurrenciesExchangeRatesDatabank;
 class ParseResult;
 
-class CurrenciesExchangeRateDatabankInitializer
+class CurrenciesExchangeRatesDatabankInitializer
 {
 public:
-    static void initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
-    static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath);
+    static void initializeCurrenciesExchangeRatesDatabank(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
+    static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::string& directoryPath);
 };

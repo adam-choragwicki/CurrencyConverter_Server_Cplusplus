@@ -16,7 +16,7 @@
 #include "messages/responses/calculate_exchange_response.h"
 #include "messages/responses/update_cache_response.h"
 
-GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank, const CurrenciesListFileContent& currenciesListFileContent)
+GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const CurrenciesListFileContent& currenciesListFileContent)
 {
     const CorrelationId& correlationId = getConfigRequest.getCorrelationId();
 
@@ -24,7 +24,7 @@ GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getCo
     return getConfigResponse;
 }
 
-CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchangeRequest& calculateExchangeRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
+CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchangeRequest& calculateExchangeRequest, const CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank)
 {
     const CurrencyCode& sourceCurrencyCode = calculateExchangeRequest.getSourceCurrencyCode();
     const CurrencyCode& targetCurrencyCode = calculateExchangeRequest.getTargetCurrencyCode();
@@ -38,11 +38,11 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
 
     if(ValidationResult validationResult = CalculateExchangeRequestValidator::validateRequest(calculateExchangeRequest); validationResult.isValid())
     {
-        if(currenciesDatabank.containsExchangeRateData(sourceCurrencyCode, targetCurrencyCode))
+        if(currenciesExchangeRatesDatabank.containsExchangeRateData(sourceCurrencyCode, targetCurrencyCode))
         {
             status = MessageContract::MessageContent::CalculateExchangeResponseContract::OK_STATUS;
 
-            const ExchangeRateData exchangeRateData = currenciesDatabank.getExchangeRateDataForCurrenciesPair(sourceCurrencyCode, targetCurrencyCode);
+            const ExchangeRateData exchangeRateData = currenciesExchangeRatesDatabank.getExchangeRateDataForCurrenciesPair(sourceCurrencyCode, targetCurrencyCode);
 
             calculationResult = Converter::convert(moneyAmount, exchangeRateData.getExchangeRate());
             currenciesExchangeRateTimestamp = exchangeRateData.getTimestamp();
@@ -75,9 +75,9 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
     return calculateExchangeResponse;
 }
 
-UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
+UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, DownloadManager& downloadManager)
 {
-    bool updateSuccessful = CurrenciesExchangeRateDatabankUpdateManager::startCurrenciesExchangeRateDatabankUpdate(currenciesDatabank, downloadManager);
+    bool updateSuccessful = CurrenciesExchangeRatesDatabankUpdateManager::startCurrenciesExchangeRatesDatabankUpdate(currenciesExchangeRatesDatabank, downloadManager);
 
     std::string status;
 

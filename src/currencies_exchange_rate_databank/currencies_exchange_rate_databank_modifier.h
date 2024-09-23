@@ -3,11 +3,11 @@
 #include "types/definitions.h"
 #include <set>
 
-class CurrenciesExchangeRateDatabank;
+class CurrenciesExchangeRatesDatabank;
 class ParseResult;
 
-class CurrenciesExchangeRateDatabankModifier
+class CurrenciesExchangeRatesDatabankModifier
 {
 public:
-    static void modifyCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
+    static void modifyCurrenciesExchangeRatesDatabank(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
 };

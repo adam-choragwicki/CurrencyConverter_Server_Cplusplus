@@ -15,7 +15,7 @@
 
 //TODO add common update failure reason exception?
 
-bool CurrenciesExchangeRateDatabankUpdateManager::startCurrenciesExchangeRateDatabankUpdate(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, DownloadManager& downloadManager)
+bool CurrenciesExchangeRatesDatabankUpdateManager::startCurrenciesExchangeRatesDatabankUpdate(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, DownloadManager& downloadManager)
 {
     spdlog::info("Starting currencies exchange rates update");
 
@@ -28,7 +28,7 @@ bool CurrenciesExchangeRateDatabankUpdateManager::startCurrenciesExchangeRateDat
 
     try
     {
-        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRateDatabank.getCurrenciesCodes()));
+        downloadReport = std::make_unique<DownloadReport>(downloadManager.downloadCurrenciesExchangeRatesFiles(Paths::CurrenciesExchangeRatesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRatesDatabank.getCurrenciesCodes()));
     }
     catch(const DownloadError& exception)
     {
@@ -47,31 +47,31 @@ bool CurrenciesExchangeRateDatabankUpdateManager::startCurrenciesExchangeRateDat
         return false;
     }
 
-    const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
+    const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRatesDatabank.getCurrenciesCodes();
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRateDatabank.getCurrenciesCodes());
+    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(Paths::CurrenciesExchangeRatesDatabankConfig::DOWNLOAD_DIRECTORY_PATH, currenciesExchangeRatesDatabank.getCurrenciesCodes());
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
 
-    CurrenciesExchangeRateDatabankModifier::modifyCurrenciesExchangeRateDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
+    CurrenciesExchangeRatesDatabankModifier::modifyCurrenciesExchangeRatesDatabank(currenciesExchangeRatesDatabank, currencyCodeToParseResultMapping);
 
     spdlog::info("Cache updated successfully in " + timer.getResult());
 
     return true;
 }
 
-void CurrenciesExchangeRateDatabankUpdateManager::prepareDownloadDirectory()
+void CurrenciesExchangeRatesDatabankUpdateManager::prepareDownloadDirectory()
 {
     //TODO add error handling
 
-    if(std::filesystem::exists(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH))
+    if(std::filesystem::exists(Paths::CurrenciesExchangeRatesDatabankConfig::DOWNLOAD_DIRECTORY_PATH))
     {
-        std::filesystem::remove_all(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+        std::filesystem::remove_all(Paths::CurrenciesExchangeRatesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
     }
 
-    std::filesystem::create_directory(Paths::CurrenciesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
+    std::filesystem::create_directory(Paths::CurrenciesExchangeRatesDatabankConfig::DOWNLOAD_DIRECTORY_PATH);
 }
 
-void CurrenciesExchangeRateDatabankUpdateManager::displayDownloadReportData(const DownloadReport& downloadReport)
+void CurrenciesExchangeRatesDatabankUpdateManager::displayDownloadReportData(const DownloadReport& downloadReport)
 {
     std::set<CurrencyCode> currenciesCodesOfFilesRequestedToBeDownloaded = downloadReport.getCurrenciesCodesOfFilesRequestedToBeDownloaded();
     std::set<CurrencyCode> currenciesCodesOfSuccessfullyDownloadedFiles_ = downloadReport.getCurrencyCodesOfSuccessfullyDownloadedFiles();

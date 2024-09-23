@@ -2,7 +2,7 @@
 
 #include "types/exchange_rate.h"
 
-class CurrenciesDatabankStub
+class CurrenciesExchangeRatesDatabankStub
 {
 public:
     static ExchangeRate getEurToUsdExchangeRate()

@@ -6,27 +6,27 @@
 #include "currencies_exchange_rate_databank.h"
 #include "utilities.h"
 
-void CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath)
+void CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::string& directoryPath)
 {
-    const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
+    const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRatesDatabank.getCurrenciesCodes();
 
     spdlog::info("Loading exchange rates data for {} currencies", allCurrenciesCodes.size());
 
     std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
 
-    initializeCurrenciesExchangeRateDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
+    initializeCurrenciesExchangeRatesDatabank(currenciesExchangeRatesDatabank, currencyCodeToParseResultMapping);
 
-    spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRateDatabank.size());
+    spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRatesDatabank.size());
 }
 
-void CurrenciesExchangeRateDatabankInitializer::initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+void CurrenciesExchangeRatesDatabankInitializer::initializeCurrenciesExchangeRatesDatabank(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
 {
     for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
     {
         if(parseResult.isSuccess_)
         {
-            currenciesExchangeRateDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+            currenciesExchangeRatesDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
         }
     }
 }

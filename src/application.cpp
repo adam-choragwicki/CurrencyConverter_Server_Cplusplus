@@ -21,26 +21,26 @@ Application::Application(const Config& config) : config_(config)
 
     auto loadCurrenciesFileContent = [this](const std::string& path)
     {
-        if(FilesHelper::fileExists(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
+        if(FilesHelper::fileExists(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
         {
-            spdlog::info("Loading '{}'", Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+            spdlog::info("Loading '{}'", Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
 
-            currenciesListFileContent_ = CurrenciesListFileContent(FilesHelper::loadFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH));
+            currenciesListFileContent_ = CurrenciesListFileContent(FilesHelper::loadFileContent(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH));
 
             return currenciesListFileContent_;
         }
         else
         {
-            spdlog::critical("File '" + Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + "' does not exist");
+            spdlog::critical("File '" + Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH + "' does not exist");
             exit(1);
         }
     };
 
-    const CurrenciesListFileContent currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+    const CurrenciesListFileContent currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
 
     spdlog::debug("Currencies exchange rate databank initialized");
 
-    currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>(currenciesListFileContent);
+    currenciesExchangeRatesDatabank_ = std::make_unique<CurrenciesExchangeRatesDatabank>(currenciesListFileContent);
     downloadManager_ = std::make_unique<DownloadManager>();
 
     spdlog::debug("Currency converter server initialized, listening on port " + std::to_string(config_.getPort()));
@@ -117,21 +117,21 @@ void Application::startClientMessageConsumingThread(ClientSocketHandler& clientS
                 if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::GET_CONFIG_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToGetConfigRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_, currenciesListFileContent_);
+                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_, currenciesListFileContent_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }
                 else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::CALCULATE_EXCHANGE_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToCalculateExchangeRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }
                 else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::UPDATE_CACHE_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToUpdateCacheRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_, *downloadManager_);
+                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_, *downloadManager_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }

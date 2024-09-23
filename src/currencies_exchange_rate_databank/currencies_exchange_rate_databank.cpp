@@ -6,7 +6,7 @@
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const CurrenciesListFileContent& currenciesListFileContent)
+CurrenciesExchangeRatesDatabank::CurrenciesExchangeRatesDatabank(const CurrenciesListFileContent& currenciesListFileContent)
 {
     if(!alreadyCreated_)
     {
@@ -15,7 +15,7 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const CurrenciesL
             currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent);
 
             //initializeCache
-            CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
+            CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
         }
         catch(JsonParseError& jsonParseError)
         {
@@ -27,28 +27,28 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const CurrenciesL
     }
     else
     {
-        throw std::runtime_error("Error, trying to construct another instance of CurrenciesExchangeRateDatabank");
+        throw std::runtime_error("Error, trying to construct another instance of CurrenciesExchangeRatesDatabank");
     }
 
     spdlog::debug("Currencies exchange rate databank initialized");
 }
 
-CurrenciesExchangeRateDatabank::~CurrenciesExchangeRateDatabank()
+CurrenciesExchangeRatesDatabank::~CurrenciesExchangeRatesDatabank()
 {
     alreadyCreated_ = false;
 }
 
-bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+bool CurrenciesExchangeRatesDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
     return currenciesExchangeRatesCache_.contains(sourceCurrencyCode) && currenciesExchangeRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
 }
 
-ExchangeRateData CurrenciesExchangeRateDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+ExchangeRateData CurrenciesExchangeRatesDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
 {
     return currenciesExchangeRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
 }
 
-void CurrenciesExchangeRateDatabank::insertAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
+void CurrenciesExchangeRatesDatabank::insertAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
     const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
 
@@ -58,7 +58,7 @@ void CurrenciesExchangeRateDatabank::insertAllExchangeRatesDataForCurrency(const
     }
 }
 
-void CurrenciesExchangeRateDatabank::reassignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
+void CurrenciesExchangeRatesDatabank::reassignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
     const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
 

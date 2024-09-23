@@ -3,15 +3,15 @@
 #include "types/definitions.h"
 #include <set>
 
-class CurrenciesExchangeRateDatabank;
+class CurrenciesExchangeRatesDatabank;
 class DownloadManager;
 class DownloadReport;
 class ParseResult;
 
-class CurrenciesExchangeRateDatabankUpdateManager
+class CurrenciesExchangeRatesDatabankUpdateManager
 {
 public:
-    static bool startCurrenciesExchangeRateDatabankUpdate(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, DownloadManager& downloadManager);
+    static bool startCurrenciesExchangeRatesDatabankUpdate(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, DownloadManager& downloadManager);
 
 private:
     static void prepareDownloadDirectory();
