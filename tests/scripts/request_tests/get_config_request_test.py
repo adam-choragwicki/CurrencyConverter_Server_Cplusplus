@@ -19,4 +19,4 @@ def test1():
 
 
 def test_get_config_request():
-    test1()
+    return test1()

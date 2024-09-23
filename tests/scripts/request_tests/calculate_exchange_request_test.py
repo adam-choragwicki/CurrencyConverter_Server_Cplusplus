@@ -95,7 +95,4 @@ def test4():
 
 
 def test_calculate_exchange_request():
-    test1()
-    test2()
-    test3()
-    test4()
+    return test1() and test2() and test3() and test4()

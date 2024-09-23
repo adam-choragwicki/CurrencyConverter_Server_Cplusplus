@@ -10,7 +10,6 @@ def assert_response(actual_response_json_dict: dict, expected_response_json_dict
         else:
             # Omit non-interesting response JSON fields
             pass
-
     return True
 
 
@@ -20,9 +19,11 @@ def print_error(message: str):
 
 def test_runner(func):
     def wrapper():
-        if func():
-            print("TEST PASSED")
-        else:
-            print_error("TEST FAILED")
+        try:
+            return func()
+
+        except Exception as e:
+            print_error(f"TEST FAILED due to exception: {e}")
+            return False
 
     return wrapper

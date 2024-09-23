@@ -27,3 +27,5 @@ def test_custom_request():
     sleep(2)
 
     send_request_json(incomplete_request1)
+
+    return True

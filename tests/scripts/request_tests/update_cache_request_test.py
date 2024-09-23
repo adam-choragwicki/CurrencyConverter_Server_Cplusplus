@@ -20,4 +20,4 @@ def test1():
 
 
 def test_update_cache_request():
-    test1()
+    return test1()
