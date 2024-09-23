@@ -11,16 +11,16 @@ set(TEST_SOURCES
         stubs/currencies_databank_stub.h
         stubs/response_stub.h
         stubs/client_id_stub.h
+        stubs/currencies_list_file_content_stub.h
         request_validator_test.cpp
         converter_test.cpp
         currency_code_test.cpp
         currencies_exchange_rate_databank_test.cpp
-        currencies_exchange_rate_databank_updater_test.cpp
         client_socket_handler_test.cpp
         request_parser_test.cpp
         downloader_test.cpp
         json_validator_test.cpp
-        json_parser_test.cpp currencies_exchange_rate_databank_modifier_test.cpp stubs/currencies_list_file_content_stub.h)
+        json_parser_test.cpp)
 
 add_subdirectory(libs/googletest)
 
@@ -28,12 +28,9 @@ add_executable(${PROJECT_NAME}Test_run ${TEST_SOURCES})
 target_include_directories(${PROJECT_NAME}Test_run PUBLIC src)
 target_link_libraries(${PROJECT_NAME}Test_run PUBLIC gtest gmock config converter message_processing socket_communication messages types currencies_exchange_rate_databank)
 
-# Copy test data directory, currencies_exchange_rate_cache directory, and the currencies_list.json file
 add_custom_command(TARGET ${PROJECT_NAME}Test_run POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_ROOT}/tests/data ${PROJECT_ROOT}/tests/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_ROOT}/tests/data/currencies_exchange_rate_cache ${PROJECT_ROOT}/tests/bin/currencies_exchange_rate_cache
         COMMAND ${CMAKE_COMMAND} -E copy
         ${PROJECT_ROOT}/tests/data/currencies_list.json ${PROJECT_ROOT}/tests/bin/data/currencies_list.json)
 
