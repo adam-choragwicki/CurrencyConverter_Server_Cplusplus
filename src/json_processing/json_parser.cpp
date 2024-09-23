@@ -7,11 +7,12 @@
 #include "json_processing/exceptions.h"
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
+#include "types/currencies_list_file_content.h"
 
-std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string)
+std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(const CurrenciesListFileContent& currenciesListFileContent)
 {
     //TODO implement expected schema
-    JsonReader jsonReader(string);
+    JsonReader jsonReader(currenciesListFileContent.toString());
 
     auto keyValuePairs = jsonReader.getKeyValuePairs();
 

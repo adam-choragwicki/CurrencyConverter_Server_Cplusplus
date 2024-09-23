@@ -20,7 +20,7 @@ set(TEST_SOURCES
         request_parser_test.cpp
         downloader_test.cpp
         json_validator_test.cpp
-        json_parser_test.cpp)
+        json_parser_test.cpp currencies_exchange_rate_databank_modifier_test.cpp stubs/currencies_list_file_content_stub.h)
 
 add_subdirectory(libs/googletest)
 

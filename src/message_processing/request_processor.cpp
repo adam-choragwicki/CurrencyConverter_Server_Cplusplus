@@ -2,6 +2,7 @@
 #include "calculate_exchange_request_validator.h"
 #include "response_factory.h"
 #include "converter/converter.h"
+#include "types/currencies_list_file_content.h"
 #include "spdlog/spdlog.h"
 
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
@@ -15,11 +16,11 @@
 #include "messages/responses/calculate_exchange_response.h"
 #include "messages/responses/update_cache_response.h"
 
-GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank, const std::string& currenciesListFileContent)
+GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank, const CurrenciesListFileContent& currenciesListFileContent)
 {
     const CorrelationId& correlationId = getConfigRequest.getCorrelationId();
 
-    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesListFileContent, correlationId);
+    auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesListFileContent.toString(), correlationId);
     return getConfigResponse;
 }
 

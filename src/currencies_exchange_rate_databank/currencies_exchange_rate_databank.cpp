@@ -6,7 +6,7 @@
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string& currenciesListFileContent)
+CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const CurrenciesListFileContent& currenciesListFileContent)
 {
     if(!alreadyCreated_)
     {
@@ -58,7 +58,7 @@ void CurrenciesExchangeRateDatabank::insertAllExchangeRatesDataForCurrency(const
     }
 }
 
-void CurrenciesExchangeRateDatabank::reAssignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
+void CurrenciesExchangeRateDatabank::reassignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
     const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
 

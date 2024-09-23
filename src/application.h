@@ -5,6 +5,7 @@
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 #include "config/config.h"
 #include "downloader/download_manager.h"
+#include "types/currencies_list_file_content.h"
 #include <atomic>
 
 class Application
@@ -35,5 +36,5 @@ private:
 
     std::mutex messageQueueMutex_;
 
-    std::string currenciesListFileContent_;
+    CurrenciesListFileContent currenciesListFileContent_;
 };

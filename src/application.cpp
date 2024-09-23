@@ -25,7 +25,7 @@ Application::Application(const Config& config) : config_(config)
         {
             spdlog::info("Loading '{}'", Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
 
-            currenciesListFileContent_ = FilesHelper::loadFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+            currenciesListFileContent_ = CurrenciesListFileContent(FilesHelper::loadFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH));
 
             return currenciesListFileContent_;
         }
@@ -36,7 +36,7 @@ Application::Application(const Config& config) : config_(config)
         }
     };
 
-    const std::string currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+    const CurrenciesListFileContent currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
 
     spdlog::debug("Currencies exchange rate databank initialized");
 

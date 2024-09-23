@@ -4,11 +4,12 @@
 #include <set>
 
 class CurrencyCode;
+class CurrenciesListFileContent;
 
 class CurrenciesExchangeRateDatabank
 {
 public:
-    explicit CurrenciesExchangeRateDatabank(const std::string& currenciesListFileContent);
+    explicit CurrenciesExchangeRateDatabank(const CurrenciesListFileContent& currenciesListFileContent);
     ~CurrenciesExchangeRateDatabank();
 
     CurrenciesExchangeRateDatabank(const CurrenciesExchangeRateDatabank&) = delete;
@@ -24,7 +25,7 @@ public:
 
     void insertAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
 
-    void reAssignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
+    void reassignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping);
 
     [[nodiscard]] size_t size() const
     { return currenciesExchangeRatesCache_.size(); }

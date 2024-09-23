@@ -9,6 +9,7 @@
 class CurrencyCode;
 class ExchangeRateData;
 class Timestamp;
+class CurrenciesListFileContent;
 class CurrencyExchangeRatesJson;
 
 struct ParseResult
@@ -22,7 +23,7 @@ class JsonParser
 public:
     JsonParser() = delete;
 
-    static std::set<CurrencyCode> parseCurrenciesListFileContentToCurrenciesCodes(const std::string& string);
+    static std::set<CurrencyCode> parseCurrenciesListFileContentToCurrenciesCodes(const CurrenciesListFileContent& string);
     static ParseResult parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(const CurrencyCode& sourceCurrencyCode,
                                                                                             const std::set<CurrencyCode>& currenciesCodes,
                                                                                             const CurrencyExchangeRatesJson& currencyExchangeRatesJson,

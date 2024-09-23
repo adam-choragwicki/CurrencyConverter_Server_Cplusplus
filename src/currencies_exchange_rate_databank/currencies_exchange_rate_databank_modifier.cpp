@@ -9,7 +9,7 @@ void CurrenciesExchangeRateDatabankModifier::modifyCurrenciesExchangeRateDataban
     {
         if(parseResult.isSuccess_)
         {
-            currenciesExchangeRateDatabank.reAssignAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+            currenciesExchangeRateDatabank.reassignAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
         }
     }
 }

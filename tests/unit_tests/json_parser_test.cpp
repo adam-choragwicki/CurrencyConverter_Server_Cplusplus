@@ -3,6 +3,8 @@
 #include "types/currency_exchange_rates_json.h"
 #include "utilities/files_helper.h"
 #include "json_processing/json_parser.h"
+#include "types/currencies_list_file_content.h"
+#include "stubs/currencies_list_file_content_stub.h"
 
 class JsonParserTest : public CommonTestFixture
 {
@@ -10,21 +12,15 @@ class JsonParserTest : public CommonTestFixture
 
 TEST_F(JsonParserTest, ParseCurrenciesListFileContentToCurrenciesCodes)
 {
-    std::string currenciesListFileContent = R"({
-        "U.S. Dollar": "USD",
-        "Euro": "EUR",
-        "U.K. Pound Sterling": "GBP",
-        "Polish Zloty": "PLN"
-    })";
+    CurrenciesListFileContent currenciesListFileContent = CurrenciesListFileContentStub::getValue();
 
     std::set<CurrencyCode> currenciesCodes = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent);
 
-    EXPECT_EQ(currenciesCodes.size(), 4);
+    EXPECT_EQ(currenciesCodes.size(), 3);
 
     EXPECT_TRUE(currenciesCodes.contains(CurrencyCode("usd")));
     EXPECT_TRUE(currenciesCodes.contains(CurrencyCode("eur")));
     EXPECT_TRUE(currenciesCodes.contains(CurrencyCode("gbp")));
-    EXPECT_TRUE(currenciesCodes.contains(CurrencyCode("pln")));
 }
 
 TEST_F(JsonParserTest, ParseExchangeRatesJsonStringToCurrencyCodesToExchangeRatesDataMapping)

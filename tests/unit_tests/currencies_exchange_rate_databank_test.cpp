@@ -1,6 +1,7 @@
 #include "common_test_fixture.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 #include "types/currency_code.h"
+#include "stubs/currencies_list_file_content_stub.h"
 
 class CurrenciesExchangeRateDatabankTest : public CommonTestFixture
 {
@@ -8,7 +9,7 @@ public:
     CurrenciesExchangeRateDatabankTest() = default;
 
 protected:
-    CurrenciesExchangeRateDatabank currenciesDatabank_{"data/currencies_list.json"};
+    CurrenciesExchangeRateDatabank currenciesDatabank_{CurrenciesListFileContentStub::getValue()};
 };
 
 TEST_F(CurrenciesExchangeRateDatabankTest, CurrenciesCount)

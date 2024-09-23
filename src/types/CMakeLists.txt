@@ -10,7 +10,7 @@ set(SOURCE_FILES
         correlation_id.h
         client_id.h
         client_info.h client_info.cpp definitions.h
-        containers/exchange_rate_data.h)
+        containers/exchange_rate_data.h currencies_list_file_content.h)
 
 add_library(types ${SOURCE_FILES})
 target_include_directories(types PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
