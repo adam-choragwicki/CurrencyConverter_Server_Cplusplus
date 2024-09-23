@@ -8,7 +8,7 @@ class CurrencyCode;
 class CurrenciesExchangeRateDatabank
 {
 public:
-    explicit CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath);
+    explicit CurrenciesExchangeRateDatabank(const std::string& currenciesListFileContent);
     ~CurrenciesExchangeRateDatabank();
 
     CurrenciesExchangeRateDatabank(const CurrenciesExchangeRateDatabank&) = delete;
@@ -18,9 +18,6 @@ public:
 
     [[nodiscard]] bool containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
     [[nodiscard]] ExchangeRateData getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const;
-
-    [[nodiscard]] const std::string& getCurrenciesListFileContent() const
-    { return currenciesListFileContent_; }
 
     [[nodiscard]] const std::set<CurrencyCode>& getCurrenciesCodes() const
     { return currenciesCodes_; }
@@ -33,9 +30,6 @@ public:
     { return currenciesExchangeRatesCache_.size(); }
 
 private:
-    static const std::string& loadCurrenciesListFileContent(const std::string& currenciesListFilepath);
-
-    const std::string currenciesListFileContent_;
     std::set<CurrencyCode> currenciesCodes_;
 
     std::map<CurrencyCode, CurrencyCodeToCurrencyExchangeRateDataMapping> currenciesExchangeRatesCache_;

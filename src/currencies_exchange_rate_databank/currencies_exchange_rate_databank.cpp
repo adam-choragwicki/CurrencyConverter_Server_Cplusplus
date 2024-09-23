@@ -1,26 +1,25 @@
 #include "currencies_exchange_rate_databank.h"
 #include "json_processing/json_parser.h"
-#include "utilities/files_helper.h"
 #include "types/currency_code.h"
 #include "json_processing/exceptions.h"
 #include "config/config.h"
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 
-CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath) : currenciesListFileContent_(loadCurrenciesListFileContent(currenciesListFilepath))
+CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string& currenciesListFileContent)
 {
     if(!alreadyCreated_)
     {
         try
         {
-            currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
+            currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent);
 
             //initializeCache
             CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
         }
         catch(JsonParseError& jsonParseError)
         {
-            spdlog::critical("Error while processing content of '{}', {}", currenciesListFilepath, jsonParseError.what());
+            spdlog::critical("Error while processing currencies list file content, {}", jsonParseError.what());
             exit(1);
         }
 
@@ -37,21 +36,6 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string
 CurrenciesExchangeRateDatabank::~CurrenciesExchangeRateDatabank()
 {
     alreadyCreated_ = false;
-}
-
-const std::string& CurrenciesExchangeRateDatabank::loadCurrenciesListFileContent(const std::string& currenciesListFilepath)
-{
-    if(FilesHelper::fileExists(currenciesListFilepath))
-    {
-        static const std::string fileContent = FilesHelper::loadFileContent(currenciesListFilepath);
-        spdlog::info("Loading '{}'", currenciesListFilepath);
-        return fileContent;
-    }
-    else
-    {
-        spdlog::critical("File '" + currenciesListFilepath + "' does not exist");
-        exit(1);
-    }
 }
 
 bool CurrenciesExchangeRateDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const

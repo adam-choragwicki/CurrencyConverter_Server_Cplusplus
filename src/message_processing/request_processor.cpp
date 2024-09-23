@@ -15,9 +15,8 @@
 #include "messages/responses/calculate_exchange_response.h"
 #include "messages/responses/update_cache_response.h"
 
-GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
+GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank, const std::string& currenciesListFileContent)
 {
-    const std::string& currenciesListFileContent = currenciesDatabank.getCurrenciesListFileContent();
     const CorrelationId& correlationId = getConfigRequest.getCorrelationId();
 
     auto getConfigResponse = ResponseFactory::makeGetConfigResponse(currenciesListFileContent, correlationId);

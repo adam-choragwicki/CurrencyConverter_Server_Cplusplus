@@ -1,7 +1,6 @@
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 #include "config/config.h"
-#include "utilities/files_helper.h"
 #include "json_processing/json_parser.h"
 #include "types/currency_code.h"
 #include "currencies_exchange_rate_databank.h"
@@ -21,7 +20,7 @@ void CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCache
     spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRateDatabank.size());
 }
 
-bool CurrenciesExchangeRateDatabankInitializer::initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+void CurrenciesExchangeRateDatabankInitializer::initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
 {
     for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
     {

@@ -10,6 +10,7 @@
 
 #include "config/config.h"
 #include "spdlog/spdlog.h"
+#include "utilities/files_helper.h"
 #include <iostream>
 
 using namespace std::chrono_literals;
@@ -17,7 +18,29 @@ using namespace std::chrono_literals;
 Application::Application(const Config& config) : config_(config)
 {
     connectionManager_ = std::make_unique<ConnectionManager>(config_);
-    currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+
+    auto loadCurrenciesFileContent = [this](const std::string& path)
+    {
+        if(FilesHelper::fileExists(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
+        {
+            spdlog::info("Loading '{}'", Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+
+            currenciesListFileContent_ = FilesHelper::loadFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+
+            return currenciesListFileContent_;
+        }
+        else
+        {
+            spdlog::critical("File '" + Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH + "' does not exist");
+            exit(1);
+        }
+    };
+
+    const std::string currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+
+    spdlog::debug("Currencies exchange rate databank initialized");
+
+    currenciesExchangeRateDatabank_ = std::make_unique<CurrenciesExchangeRateDatabank>(currenciesListFileContent);
     downloadManager_ = std::make_unique<DownloadManager>();
 
     spdlog::debug("Currency converter server initialized, listening on port " + std::to_string(config_.getPort()));
@@ -94,7 +117,7 @@ void Application::startClientMessageConsumingThread(ClientSocketHandler& clientS
                 if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::GET_CONFIG_REQUEST)
                 {
                     const auto& request = InboundMessageParser::parseToGetConfigRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_);
+                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRateDatabank_, currenciesListFileContent_);
 
                     connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
                 }

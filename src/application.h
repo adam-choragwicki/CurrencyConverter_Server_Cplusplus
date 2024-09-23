@@ -34,4 +34,6 @@ private:
     std::unique_ptr<InboundMessageQueue> inboundMessageQueue_;
 
     std::mutex messageQueueMutex_;
+
+    std::string currenciesListFileContent_;
 };

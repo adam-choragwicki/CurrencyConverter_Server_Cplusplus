@@ -11,6 +11,6 @@ class ParseResult;
 class CurrenciesExchangeRateDatabankInitializer
 {
 public:
-    static bool initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
+    static void initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping);
     static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath);
 };
