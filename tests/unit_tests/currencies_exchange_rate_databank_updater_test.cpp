@@ -1,22 +1,26 @@
 #include "common_test_fixture.h"
-#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 #include "types/currency_code.h"
+#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
+#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_updater.h"
 
-class CurrenciesExchangeRateDatabankTest : public CommonTestFixture
+
+class CurrenciesExchangeRateDatabankUpdaterTest : public CommonTestFixture
 {
 public:
-    CurrenciesExchangeRateDatabankTest() = default;
+    CurrenciesExchangeRateDatabankUpdaterTest() = default;
 
 protected:
     CurrenciesExchangeRateDatabank currenciesDatabank_{"data/currencies_list.json"};
 };
 
-TEST_F(CurrenciesExchangeRateDatabankTest, CurrenciesCount)
+TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, CurrenciesCount)
 {
+    CurrenciesExchangeRateDatabankUpdater currenciesExchangeRateDatabankUpdater;
+    currenciesExchangeRateDatabankUpdater.startCurrenciesExchangeRateDatabankUpdate()
     EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 3);
 }
 
-TEST_F(CurrenciesExchangeRateDatabankTest, AllCombinationsOfExchangeRatesArePresent)
+TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, AllCombinationsOfExchangeRatesArePresent)
 {
     EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("gbp")));
     EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("usd")));
@@ -28,7 +32,7 @@ TEST_F(CurrenciesExchangeRateDatabankTest, AllCombinationsOfExchangeRatesArePres
     EXPECT_TRUE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("usd"), CurrencyCode("gbp")));
 }
 
-TEST_F(CurrenciesExchangeRateDatabankTest, XToXExchangeRatesAreNotPresent)
+TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, XToXExchangeRatesAreNotPresent)
 {
     EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("eur"), CurrencyCode("eur")));
     EXPECT_FALSE(currenciesDatabank_.containsExchangeRateData(CurrencyCode("gbp"), CurrencyCode("gbp")));

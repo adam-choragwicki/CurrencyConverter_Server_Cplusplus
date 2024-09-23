@@ -2,8 +2,10 @@
 #include "calculate_exchange_request_validator.h"
 #include "response_factory.h"
 #include "converter/converter.h"
-#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
 #include "spdlog/spdlog.h"
+
+#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
+#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_update_manager.h"
 
 #include "messages/requests/get_config_request.h"
 #include "messages/requests/calculate_exchange_request.h"
@@ -12,7 +14,6 @@
 #include "messages/responses/get_config_response.h"
 #include "messages/responses/calculate_exchange_response.h"
 #include "messages/responses/update_cache_response.h"
-#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_updater.h"
 
 GetConfigResponse RequestProcessor::processRequest(const GetConfigRequest& getConfigRequest, const CurrenciesExchangeRateDatabank& currenciesDatabank)
 {
@@ -76,11 +77,9 @@ CalculateExchangeResponse RequestProcessor::processRequest(const CalculateExchan
 
 UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& updateCacheRequest, CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager)
 {
-    bool updateSuccessful = CurrenciesExchangeRateDatabankUpdater::startCacheUpdate(currenciesDatabank, downloadManager);
+    bool updateSuccessful = CurrenciesExchangeRateDatabankUpdateManager::startCurrenciesExchangeRateDatabankUpdate(currenciesDatabank, downloadManager);
 
     std::string status;
-
-    const CorrelationId& correlationId = updateCacheRequest.getCorrelationId();
 
     if(updateSuccessful)
     {
@@ -90,6 +89,8 @@ UpdateCacheResponse RequestProcessor::processRequest(const UpdateCacheRequest& u
     {
         status = MessageContract::MessageContent::UpdateCacheResponseContract::FAIL_STATUS;
     }
+
+    const CorrelationId& correlationId = updateCacheRequest.getCorrelationId();
 
     auto updateCacheResponse = ResponseFactory::makeUpdateCacheResponse(status, correlationId);
     return updateCacheResponse;

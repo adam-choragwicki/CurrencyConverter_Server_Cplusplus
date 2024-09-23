@@ -15,6 +15,7 @@ set(TEST_SOURCES
         converter_test.cpp
         currency_code_test.cpp
         currencies_exchange_rate_databank_test.cpp
+        currencies_exchange_rate_databank_updater_test.cpp
         client_socket_handler_test.cpp
         request_parser_test.cpp
         downloader_test.cpp
