@@ -37,7 +37,8 @@ private:
 
     const std::string currenciesListFileContent_;
     std::set<CurrencyCode> currenciesCodes_;
-    CurrenciesExchangeRatesCache currenciesExchangeRatesCache_;
+
+    std::map<CurrencyCode, CurrencyCodeToCurrencyExchangeRateDataMapping> currenciesExchangeRatesCache_;
 
     inline static bool alreadyCreated_{};
 };

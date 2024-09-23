@@ -70,7 +70,7 @@ void CurrenciesExchangeRateDatabank::insertAllExchangeRatesDataForCurrency(const
 
     if(!inserted)
     {
-        spdlog::error("Error, this should insert, not assign");
+        throw std::runtime_error("Error, exchange rate data for currency '" + sourceCurrency.toString() + "' already exists");
     }
 }
 
@@ -80,6 +80,6 @@ void CurrenciesExchangeRateDatabank::reAssignAllExchangeRatesDataForCurrency(con
 
     if(inserted)
     {
-        spdlog::error("Error, this should not insert");
+        throw std::runtime_error("Error, exchange rate data for currency '" + sourceCurrency.toString() + "' does not exist");
     }
 }
