@@ -13,23 +13,23 @@ void CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCache
 
     spdlog::info("Loading exchange rates data for {} currencies", allCurrenciesCodes.size());
 
-    auto initializeCurrenciesExchangeRateDatabank = [](CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
-    {
-        for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
-        {
-            if(parseResult.isSuccess_)
-            {
-                currenciesExchangeRateDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
-            }
-        }
-    };
-
     std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
 
     initializeCurrenciesExchangeRateDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
 
     spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRateDatabank.size());
+}
+
+bool CurrenciesExchangeRateDatabankInitializer::initializeCurrenciesExchangeRateDatabank(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+{
+    for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
+    {
+        if(parseResult.isSuccess_)
+        {
+            currenciesExchangeRateDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+        }
+    }
 }
 
 //    for(const CurrencyCode& currencyCode : currenciesCodes)
