@@ -6,7 +6,7 @@
 class CurrencyCode;
 class CurrenciesExchangeRateDatabank;
 
-class CurrenciesExchangeRateDatabankLoader
+class CurrenciesExchangeRateDatabankInitializer
 {
 public:
     static void loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath);

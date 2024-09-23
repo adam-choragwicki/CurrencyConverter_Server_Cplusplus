@@ -1,7 +1,7 @@
 #include "common_test_fixture.h"
 #include "types/currency_code.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
-#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_updater.h"
+#include "currencies_exchange_rate_databank/currencies_exchange_rate_databank_modifier.h"
 
 
 class CurrenciesExchangeRateDatabankUpdaterTest : public CommonTestFixture
@@ -15,8 +15,7 @@ protected:
 
 TEST_F(CurrenciesExchangeRateDatabankUpdaterTest, CurrenciesCount)
 {
-    CurrenciesExchangeRateDatabankUpdater currenciesExchangeRateDatabankUpdater;
-    currenciesExchangeRateDatabankUpdater.startCurrenciesExchangeRateDatabankUpdate()
+    CurrenciesExchangeRateDatabankModifier currenciesExchangeRateDatabankUpdater;
     EXPECT_EQ(currenciesDatabank_.getCurrenciesCodes().size(), 3);
 }
 

@@ -1,4 +1,4 @@
-#include "currencies_exchange_rate_databank_loader.h"
+#include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 #include "config/config.h"
 #include "utilities/files_helper.h"
@@ -7,13 +7,13 @@
 #include "currencies_exchange_rate_databank.h"
 #include "utilities.h"
 
-void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath)
+void CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::string& directoryPath)
 {
     const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRateDatabank.getCurrenciesCodes();
 
     spdlog::info("Loading exchange rates data for {} currencies", allCurrenciesCodes.size());
 
-    auto loadDatabank = [](CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
+    auto initializeCurrenciesExchangeRateDatabank = [](CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
     {
         for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
         {
@@ -26,7 +26,8 @@ void CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromF
 
     std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
     std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
-    loadDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
+
+    initializeCurrenciesExchangeRateDatabank(currenciesExchangeRateDatabank, currencyCodeToParseResultMapping);
 
     spdlog::info("Loaded exchange rates data for {} currencies", currenciesExchangeRateDatabank.size());
 }

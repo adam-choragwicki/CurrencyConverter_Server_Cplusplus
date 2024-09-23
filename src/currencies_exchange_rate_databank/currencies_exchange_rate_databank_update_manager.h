@@ -11,7 +11,7 @@ class ParseResult;
 class CurrenciesExchangeRateDatabankUpdateManager
 {
 public:
-    static bool startCurrenciesExchangeRateDatabankUpdate(CurrenciesExchangeRateDatabank& currenciesDatabank, DownloadManager& downloadManager);
+    static bool startCurrenciesExchangeRateDatabankUpdate(CurrenciesExchangeRateDatabank& currenciesExchangeRateDatabank, DownloadManager& downloadManager);
 
 private:
     static void prepareDownloadDirectory();

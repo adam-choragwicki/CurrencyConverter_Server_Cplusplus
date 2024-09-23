@@ -4,7 +4,7 @@
 #include "types/currency_code.h"
 #include "json_processing/exceptions.h"
 #include "config/config.h"
-#include "currencies_exchange_rate_databank_loader.h"
+#include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 
 CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string& currenciesListFilepath) : currenciesListFileContent_(loadCurrenciesListFileContent(currenciesListFilepath))
@@ -16,7 +16,7 @@ CurrenciesExchangeRateDatabank::CurrenciesExchangeRateDatabank(const std::string
             currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent_);
 
             //initializeCache
-            CurrenciesExchangeRateDatabankLoader::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
+            CurrenciesExchangeRateDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
         }
         catch(JsonParseError& jsonParseError)
         {
@@ -74,7 +74,7 @@ void CurrenciesExchangeRateDatabank::insertAllExchangeRatesDataForCurrency(const
     }
 }
 
-void CurrenciesExchangeRateDatabank::updateAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
+void CurrenciesExchangeRateDatabank::reAssignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
     const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
 
