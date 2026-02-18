@@ -7,4 +7,10 @@ set(SOURCE_FILES
         exceptions.h)
 
 add_library(json_processing ${SOURCE_FILES})
-target_include_directories(json_processing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. ${JSON_LIB_SRC_DIR})
+target_link_libraries(json_processing
+        PUBLIC
+        project_includes
+        types
+        third_party::rapidjson
+        PRIVATE
+        third_party::spdlog)

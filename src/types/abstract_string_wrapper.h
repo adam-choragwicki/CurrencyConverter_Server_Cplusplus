@@ -2,13 +2,17 @@
 
 #include <string>
 #include <stdexcept>
+#include <algorithm>
+#include <cctype>
+#include <iterator>
 
+template<typename T> // for CRTP
 class AbstractStringWrapper
 {
 public:
     explicit AbstractStringWrapper(const std::string& string) : string_(string)
     {
-        if(string.empty())
+        if (string.empty())
         {
             throw std::runtime_error("Error, trying to construct empty string wrapper");
         }
@@ -22,38 +26,17 @@ public:
     [[nodiscard]] std::string toUpperCase() const
     {
         std::string upperCode;
-        std::transform(string_.begin(), string_.end(), std::back_inserter(upperCode), ::toupper);
+        upperCode.reserve(string_.size());
+
+        std::ranges::transform(string_, std::back_inserter(upperCode), [](const unsigned char c) { return static_cast<char>(std::toupper(c)); });
+
         return upperCode;
     }
 
-    template <typename T>
-    requires std::is_base_of<AbstractStringWrapper, T>::value || std::is_same_v<T, std::string>
-    bool operator==(const T& other) const
-    {
-        if constexpr (std::is_same_v<T, std::string>)
-        {
-            return string_ == other;
-        }
-        else
-        {
-            return string_ == other.toString();
-        }
-    }
-
-    template <typename T>
-    requires std::is_base_of<AbstractStringWrapper, T>::value || std::is_same_v<T, std::string>
-    bool operator<(const T& other) const
-    {
-        if constexpr (std::is_same_v<T, std::string>)
-        {
-            return string_ < other;
-        }
-        else
-        {
-            return string_ < other.toString();
-        }
-    }
+    // CRTP enforces strong type comparison safety
+    auto operator<=>(const AbstractStringWrapper&) const = default;
 
 private:
+    using StrongTypeTag = T; // silence unused parameter type T warning
     std::string string_;
 };

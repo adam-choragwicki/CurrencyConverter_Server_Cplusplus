@@ -1,10 +1,11 @@
 #pragma once
 
 #include "types/definitions.h"
+#include "json_processing/json_parser.h"
 #include <set>
 
 class CurrenciesExchangeRatesDatabank;
-class ParseResult;
+struct ParseResult;
 
 class CurrenciesExchangeRatesDatabankModifier
 {

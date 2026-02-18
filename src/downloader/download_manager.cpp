@@ -30,12 +30,14 @@ DownloadManager::~DownloadManager()
     alreadyCreated_ = false;
 }
 
-DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath, const std::set<CurrencyCode>& currenciesCodes)
+DownloadReport DownloadManager::downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath,
+                                                                     const std::set<CurrencyCode>& currenciesCodes,
+                                                                     const std::function<void(size_t completed, size_t total)>& onProgress)
 {
     try
     {
         CurlManager curlManager(downloadDirectoryPath);
-        return curlManager.downloadMultiplexing(currenciesCodes);
+        return curlManager.downloadMultiplexing(currenciesCodes, onProgress);
     }
     catch(const CurlError& exception)
     {

@@ -1,19 +1,19 @@
 #pragma once
 
-#include "types/definitions.h"
-#include <set>
+#include <functional>
 
 class CurrenciesExchangeRatesDatabank;
 class DownloadManager;
 class DownloadReport;
-class ParseResult;
 
 class CurrenciesExchangeRatesDatabankUpdateManager
 {
 public:
-    static bool startCurrenciesExchangeRatesDatabankUpdate(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, DownloadManager& downloadManager);
+    static bool startCurrenciesExchangeRatesDatabankUpdate(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank,
+                                                           DownloadManager& downloadManager,
+                                                           const std::function<void(size_t completed, size_t total)>& onProgress);
 
 private:
-    static void prepareDownloadDirectory();
+    static bool prepareDownloadDirectory();
     static void displayDownloadReportData(const DownloadReport& downloadReport);
 };

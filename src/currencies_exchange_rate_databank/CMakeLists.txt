@@ -6,4 +6,12 @@ set(SOURCE_FILES
         utilities.cpp utilities.h)
 
 add_library(currencies_exchange_rate_databank ${SOURCE_FILES})
-target_link_libraries(currencies_exchange_rate_databank downloader types utilities)
+target_link_libraries(currencies_exchange_rate_databank
+        PUBLIC
+        project_includes
+        types
+        json_processing
+        downloader
+        utilities
+        PRIVATE
+        third_party::spdlog)

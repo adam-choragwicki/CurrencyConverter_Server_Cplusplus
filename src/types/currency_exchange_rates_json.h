@@ -2,9 +2,9 @@
 
 #include "abstract_string_wrapper.h"
 
-class CurrencyExchangeRatesJson : public AbstractStringWrapper
+class CurrencyExchangeRatesJson : public AbstractStringWrapper<CurrencyExchangeRatesJson>
 {
 public:
-    explicit CurrencyExchangeRatesJson(const std::string& string = "NULL") : AbstractStringWrapper(string)
+    explicit CurrencyExchangeRatesJson(const std::string& string) : AbstractStringWrapper(string)
     {}
 };

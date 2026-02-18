@@ -5,104 +5,99 @@ ValidationResult CalculateExchangeRequestValidator::validateRequest(const Calcul
 {
     std::string failureReason;
 
-    if(isMoneyAmountEmpty(calculateExchangeRequest))
+    if (isCurrencyAmountEmpty(calculateExchangeRequest))
     {
         failureReason = "Money amount string is empty";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(!doesMoneyAmountContainOnlyPermittedCharacters(calculateExchangeRequest))
+    if (!doesCurrencyAmountContainOnlyPermittedCharacters(calculateExchangeRequest))
     {
         failureReason = "Money amount string contains forbidden characters";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(!isMoneyAmountNumeric(calculateExchangeRequest))
+    if (!isCurrencyAmountNumeric(calculateExchangeRequest))
     {
         failureReason = "Money amount string is not a number";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(isMoneyAmountOctalNumber(calculateExchangeRequest))
+    if (isCurrencyAmountOctalNumber(calculateExchangeRequest))
     {
         failureReason = "Money amount string is octal";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(isMoneyAmountHexadecimalNumber(calculateExchangeRequest))
+    if (isCurrencyAmountHexadecimalNumber(calculateExchangeRequest))
     {
         failureReason = "Money amount string is hexadecimal";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(isMoneyAmountNegativeNumber(calculateExchangeRequest))
+    if (isCurrencyAmountNegativeNumber(calculateExchangeRequest))
     {
         failureReason = "Money amount string is negative number";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(isSourceCurrencyEqualTargetCurrency(calculateExchangeRequest))
+    if (isSourceCurrencyEqualTargetCurrency(calculateExchangeRequest))
     {
         failureReason = "Source and target currency is the same";
-        return {false, failureReason};
+        return ValidationResult::setFailure(failureReason);
     }
 
-    if(!failureReason.empty())
-    {
-        spdlog::error(failureReason);
-    }
-
-    return {true, ""};
+    return ValidationResult::setSuccess();
 }
 
-bool CalculateExchangeRequestValidator::isMoneyAmountEmpty(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::isCurrencyAmountEmpty(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
-    return moneyAmount.toString().empty();
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
+    return currencyAmount.toString().empty();
 }
 
-bool CalculateExchangeRequestValidator::doesMoneyAmountContainOnlyPermittedCharacters(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::doesCurrencyAmountContainOnlyPermittedCharacters(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
 
-    return std::ranges::all_of(moneyAmount.toString(), [](const char& character)
+    return std::ranges::all_of(currencyAmount.toString(), [](const char& character)
     {
         return std::isdigit(character) || character == '.';
     });
 }
 
-bool CalculateExchangeRequestValidator::isMoneyAmountNumeric(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::isCurrencyAmountNumeric(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
 
     try
     {
         size_t successfullyProcessedCharacters;
-        std::stod(moneyAmount.toString(), &successfullyProcessedCharacters);
-        return successfullyProcessedCharacters == moneyAmount.toString().size();
+        static_cast<void>(std::stod(currencyAmount.toString(), &successfullyProcessedCharacters));
+        return successfullyProcessedCharacters == currencyAmount.toString().size();
     }
-    catch(const std::invalid_argument& exception)
+    catch (const std::invalid_argument&)
     {
         return false;
     }
 }
 
-bool CalculateExchangeRequestValidator::isMoneyAmountOctalNumber(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::isCurrencyAmountOctalNumber(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
-    return moneyAmount.toString().length() >= 2 && moneyAmount.toString().starts_with("0") && moneyAmount.toString().at(1) != '.';
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
+    return currencyAmount.toString().length() >= 2 && currencyAmount.toString().starts_with("0") && currencyAmount.toString().at(1) != '.';
 }
 
-bool CalculateExchangeRequestValidator::isMoneyAmountHexadecimalNumber(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::isCurrencyAmountHexadecimalNumber(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
-    return moneyAmount.toString().starts_with("0x");
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
+    return currencyAmount.toString().starts_with("0x");
 }
 
-bool CalculateExchangeRequestValidator::isMoneyAmountNegativeNumber(const CalculateExchangeRequest& calculateExchangeRequest)
+bool CalculateExchangeRequestValidator::isCurrencyAmountNegativeNumber(const CalculateExchangeRequest& calculateExchangeRequest)
 {
-    const MoneyAmount& moneyAmount = calculateExchangeRequest.getMoneyAmount();
-    return moneyAmount.toString().at(0) == '-';
+    const CurrencyAmount& currencyAmount = calculateExchangeRequest.getSourceCurrencyAmount();
+    return currencyAmount.toString().at(0) == '-';
 }
 
 bool CalculateExchangeRequestValidator::isSourceCurrencyEqualTargetCurrency(const CalculateExchangeRequest& calculateExchangeRequest)

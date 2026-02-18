@@ -2,9 +2,9 @@
 
 #include "abstract_string_wrapper.h"
 
-class Timestamp : public AbstractStringWrapper
+class Timestamp : public AbstractStringWrapper<Timestamp>
 {
 public:
-    explicit Timestamp(const std::string& string = "NULL") : AbstractStringWrapper(string)
+    explicit Timestamp(const std::string& string) : AbstractStringWrapper(string)
     {}
 };

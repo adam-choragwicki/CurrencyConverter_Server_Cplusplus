@@ -1,12 +1,11 @@
 #pragma once
 
-#include <set>
 #include <string>
 #include <map>
 
 class CurrencyCode;
 class CurrenciesExchangeRatesDatabank;
-class ParseResult;
+struct ParseResult;
 
 class CurrenciesExchangeRatesDatabankInitializer
 {

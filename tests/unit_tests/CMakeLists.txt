@@ -1,37 +1,45 @@
-cmake_minimum_required(VERSION 3.10)
-
 set(TEST_SOURCES
         main.cpp
-        common_test_fixture.h
-        test_utilities.h
-        test_utilities.cpp
-        mocks/client_fake.h
-        mocks/server_fake.h
-        stubs/config_stub.h
-        stubs/currencies_databank_stub.h
-        stubs/response_stub.h
-        stubs/client_id_stub.h
-        stubs/currencies_list_file_content_stub.h
-        request_validator_test.cpp
-        converter_test.cpp
-        currency_code_test.cpp
-        currencies_exchange_rate_databank_test.cpp
-        client_socket_handler_test.cpp
-        request_parser_test.cpp
-        downloader_test.cpp
-        json_validator_test.cpp
-        json_parser_test.cpp)
+        test_helpers.h
+        test_currency_code.cpp
+        test_converter.cpp
+        test_calculate_exchange_request_validator.cpp
+        test_http_request_parser.cpp
+        test_json_parser.cpp
+        test_json_validator.cpp
+        test_currencies_exchange_rate_databank.cpp
+        test_download_report.cpp
+        test_cache_update.cpp)
 
-add_subdirectory(libs/googletest)
+if (MSVC)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif ()
 
-add_executable(${PROJECT_NAME}Test_run ${TEST_SOURCES})
-target_include_directories(${PROJECT_NAME}Test_run PUBLIC src)
-target_link_libraries(${PROJECT_NAME}Test_run PUBLIC gtest gmock config converter message_processing socket_communication messages types currencies_exchange_rate_databank)
+add_subdirectory(googletest)
 
-add_custom_command(TARGET ${PROJECT_NAME}Test_run POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_ROOT}/tests/data ${PROJECT_ROOT}/tests/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_ROOT}/tests/data/currencies_list.json ${PROJECT_ROOT}/tests/bin/data/currencies_list.json)
+add_executable(currency_converter_server_unit_tests ${TEST_SOURCES})
 
-set_target_properties(${PROJECT_NAME}Test_run PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT}/tests/bin)
+target_link_libraries(currency_converter_server_unit_tests
+        PRIVATE
+        project_includes
+        third_party::spdlog
+        types
+        converter
+        json_processing
+        message_processing
+        currencies_exchange_rate_databank
+        downloader
+        http_server
+        gtest)
+
+target_compile_definitions(currency_converter_server_unit_tests
+        PRIVATE
+        UNIT_TEST_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+
+if (MSVC)
+    target_compile_options(currency_converter_server_unit_tests PRIVATE /FS)
+endif ()
+
+include(GoogleTest)
+
+gtest_discover_tests(currency_converter_server_unit_tests)

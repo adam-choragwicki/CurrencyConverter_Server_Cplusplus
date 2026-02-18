@@ -1,219 +1,76 @@
 #include "application.h"
-#include "socket_communication/exceptions.h"
-#include "message_processing/exceptions.h"
-#include "message_processing/request_parser.h"
-#include "message_processing/request_processor.h"
-
-#include "messages/responses/get_config_response.h"
-#include "messages/responses/calculate_exchange_response.h"
-#include "messages/responses/update_cache_response.h"
-
-#include "config/config.h"
+#include "http/server_manager.h"
+#include "utilities/file_helper.h"
+#include "paths.h"
+#include "json_processing/json_parser.h"
+#include "log_manager.h"
 #include "spdlog/spdlog.h"
-#include "utilities/files_helper.h"
-#include <iostream>
+#include "downloader/download_manager.h"
+#include "http/request_handlers/status_request_handler.h"
+#include "http/request_handlers/get_config_request_handler.h"
+#include "http/request_handlers/calculate_exchange_request_handler.h"
+#include "http/request_handlers/update_cache_request_handler.h"
+#include "http/request_handlers/update_cache_progress_request_handler.h"
+#include "services/request_processing_service.h"
 
-using namespace std::chrono_literals;
-
-Application::Application(const Config& config) : config_(config)
+Application::Application()
 {
-    connectionManager_ = std::make_unique<ConnectionManager>(config_);
+    LogManager::setupLogging();
 
-    auto loadCurrenciesFileContent = [this](const std::string& path)
-    {
-        if(FilesHelper::fileExists(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH))
-        {
-            spdlog::info("Loading '{}'", Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+    spdlog::info("Starting currency converter server...");
 
-            currenciesListFileContent_ = CurrenciesListFileContent(FilesHelper::loadFileContent(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH));
+    const ConnectionData connectionData = loadConnectionData();
+    const ConfigData configData = loadConfigData();
 
-            return currenciesListFileContent_;
-        }
-        else
-        {
-            spdlog::critical("File '" + Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH + "' does not exist");
-            exit(1);
-        }
-    };
+    const CurrenciesNamesAndCodesFileContent currenciesNamesAndCodesFileContent = loadCurrenciesNamesAndCodesFileContent();
+    // spdlog::debug("{} file content: {}", Paths::CURRENCIES_NAMES_AND_CODES_FILE_PATH, currenciesNamesAndCodesFileContent_.toString());
 
-    const CurrenciesListFileContent currenciesListFileContent = loadCurrenciesFileContent(Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_LIST_FILE_PATH);
+    currenciesExchangeRatesDatabank_ = std::make_unique<CurrenciesExchangeRatesDatabank>(currenciesNamesAndCodesFileContent);
 
     spdlog::debug("Currencies exchange rate databank initialized");
 
-    currenciesExchangeRatesDatabank_ = std::make_unique<CurrenciesExchangeRatesDatabank>(currenciesListFileContent);
     downloadManager_ = std::make_unique<DownloadManager>();
 
-    spdlog::debug("Currency converter server initialized, listening on port " + std::to_string(config_.getPort()));
-    runApplication();
+    requestProcessingService_ = std::make_unique<RequestProcessingService>(configData,
+                                                                           currenciesNamesAndCodesFileContent,
+                                                                           *currenciesExchangeRatesDatabank_,
+                                                                           *downloadManager_);
+
+    statusRequestHandler_ = std::make_unique<StatusRequestHandler>(*requestProcessingService_);
+    getConfigRequestHandler_ = std::make_unique<GetConfigRequestHandler>(*requestProcessingService_);
+    calculateExchangeRequestHandler_ = std::make_unique<CalculateExchangeRequestHandler>(*requestProcessingService_);
+    updateCacheRequestHandler_ = std::make_unique<UpdateCacheRequestHandler>(*requestProcessingService_);
+    updateCacheProgressRequestHandler_ = std::make_unique<UpdateCacheProgressRequestHandler>(*requestProcessingService_);
+
+    ServerManager serverManager(connectionData.host,
+                                connectionData.port,
+                                *statusRequestHandler_,
+                                *getConfigRequestHandler_,
+                                *calculateExchangeRequestHandler_,
+                                *updateCacheRequestHandler_,
+                                *updateCacheProgressRequestHandler_);
+
+    serverManager.listen(); // blocking call
 }
 
-void Application::runApplication()
+Application::~Application()
 {
-    std::atomic_bool closeApplicationCommandReceived = false;
-
-    startInteractiveInputModeThread(closeApplicationCommandReceived);
-    startInboundMessageProcessingThread();
-    startWaitForConnectionAndAcceptThread();
-
-    while(true)
-    {
-        if(closeApplicationCommandReceived)
-        {
-            return;
-        }
-
-        std::this_thread::sleep_for(500ms);
-    }
+    spdlog::info("Server stopped cleanly");
 }
 
-void Application::startInteractiveInputModeThread(std::atomic_bool& closeApplicationCommandReceived)
+ConfigData Application::loadConfigData()
 {
-    std::thread(&Application::interactiveInputModeThread, this, std::ref(closeApplicationCommandReceived)).detach();
+    const std::string configFileContent = FileHelper::loadFileContent(Paths::CONFIG_FILE_PATH);
+    return JsonParser::parseConfigData(configFileContent);
 }
 
-void Application::startInboundMessageProcessingThread()
+ConnectionData Application::loadConnectionData()
 {
-    std::thread(&Application::inboundMessageProcessingThread, this).detach();
+    const std::string connectionFileContent = FileHelper::loadFileContent(Paths::CONNECTION_FILE_PATH);
+    return JsonParser::parseConnectionData(connectionFileContent);
 }
 
-void Application::startWaitForConnectionAndAcceptThread()
+CurrenciesNamesAndCodesFileContent Application::loadCurrenciesNamesAndCodesFileContent()
 {
-    std::thread(&Application::waitForConnectionAndAcceptThread, this).detach();
-}
-
-void Application::startClientMessageConsumingThread(ClientSocketHandler& clientSocketHandler)
-{
-    std::thread(&Application::clientMessageConsumingThread, this, std::ref(clientSocketHandler)).detach();
-}
-
-[[noreturn]] void Application::waitForConnectionAndAcceptThread()
-{
-    while(true)
-    {
-        ClientSocketHandler& clientSocketHandler = connectionManager_->waitForConnectionAndAccept();
-        startClientMessageConsumingThread(clientSocketHandler);
-    }
-}
-
-[[noreturn]] void Application::inboundMessageProcessingThread()
-{
-    inboundMessageQueue_ = std::make_unique<InboundMessageQueue>();
-
-    while(true)
-    {
-        while(inboundMessageQueue_->hasMessages())
-        {
-            messageQueueMutex_.lock();
-            const RawInboundMessage& rawInboundMessage = inboundMessageQueue_->popMessage();
-            messageQueueMutex_.unlock();
-
-            try
-            {
-                ParsedInboundMessage parsedInboundMessage = InboundMessageParser::parseRawInboundMessage(rawInboundMessage);
-
-                spdlog::info(" [<-] Processing " + parsedInboundMessage.getMessageType().toString() + " [" + parsedInboundMessage.getCorrelationId().toString() + "]");
-                spdlog::debug(parsedInboundMessage.getMessageBody().toString());
-
-                if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::GET_CONFIG_REQUEST)
-                {
-                    const auto& request = InboundMessageParser::parseToGetConfigRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_, currenciesListFileContent_);
-
-                    connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
-                }
-                else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::CALCULATE_EXCHANGE_REQUEST)
-                {
-                    const auto& request = InboundMessageParser::parseToCalculateExchangeRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_);
-
-                    connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
-                }
-                else if(parsedInboundMessage.getMessageType() == MessageContract::MessageType::RequestType::UPDATE_CACHE_REQUEST)
-                {
-                    const auto& request = InboundMessageParser::parseToUpdateCacheRequest(parsedInboundMessage);
-                    const auto& response = RequestProcessor::processRequest(request, *currenciesExchangeRatesDatabank_, *downloadManager_);
-
-                    connectionManager_->sendResponse(response, parsedInboundMessage.getSenderId());
-                }
-                else
-                {
-                    throw InboundMessageError("Error, unsupported message type");
-                }
-            }
-            catch(const InboundMessageError& exception)
-            {
-                spdlog::error(exception.what() + std::string(". Message discarded"));
-                spdlog::debug("Discarded message: {}", rawInboundMessage.getMessageBody().toString());
-            }
-        }
-
-        std::this_thread::sleep_for(50ms);
-    }
-}
-
-void Application::clientMessageConsumingThread(ClientSocketHandler& clientSocketHandler)
-{
-    try
-    {
-        spdlog::info(" [*] Starting consuming messages");
-
-        while(true)
-        {
-            /*Blocking*/
-            MessageBody receivedMessageBody = MessageBody(clientSocketHandler.receiveMessage());
-
-            RawInboundMessage rawInboundMessage(receivedMessageBody, clientSocketHandler.getId());
-
-            spdlog::debug(" [<-] Received " + std::to_string(rawInboundMessage.getMessageBody().toString().size()) + " bytes: " + rawInboundMessage.getMessageBody().toString());
-
-            std::lock_guard<std::mutex> lock(messageQueueMutex_);
-            inboundMessageQueue_->addMessage(rawInboundMessage);
-        }
-    }
-    catch(const ConnectionClosedByClient& exception)
-    {
-        spdlog::info(" [*] Connection closed by client");
-        connectionManager_->closeConnection(clientSocketHandler);
-    }
-}
-
-void Application::interactiveInputModeThread(std::atomic_bool& closeApplicationCommandReceived)
-{
-    spdlog::info("Started interactive input mode. Please type 'exit' to stop server or 'clients' to display list of currently connected clients");
-
-    std::string userInput;
-
-    while(std::getline(std::cin, userInput))
-    {
-        std::transform(userInput.begin(), userInput.end(), userInput.begin(), ::tolower);
-
-        if(userInput == "exit")
-        {
-            spdlog::info("Received exit command");
-            closeApplicationCommandReceived = true;
-            return;
-        }
-        else if(userInput == "clients")
-        {
-            const auto& connectedClients = connectionManager_->getConnectedClients();
-
-            if(connectedClients.empty())
-            {
-                spdlog::info("No connected clients");
-            }
-            else
-            {
-                spdlog::info("Connected clients:");
-
-                for(const ClientInfo& clientInfo : connectedClients)
-                {
-                    spdlog::info("ID: {}, IP: {}, PORT: {}, FD: {}", clientInfo.getId().toString(), clientInfo.getAddress(), clientInfo.getPort(), clientInfo.getSocketFD());
-                }
-            }
-        }
-        else
-        {
-            spdlog::warn("Unrecognized command. Please type 'exit' to stop server or 'clients' to display list of currently connected clients");
-        }
-    }
+    return CurrenciesNamesAndCodesFileContent(FileHelper::loadFileContent(Paths::CURRENCIES_NAMES_AND_CODES_FILE_PATH));
 }

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "utilities.h"
-#include "types/definitions.h"
 #include "download_report.h"
 #include <set>
 #include <map>
+#include <functional>
 
 class CurrencyCode;
 class CurrencyExchangeRatesJson;
@@ -21,11 +21,12 @@ class CurlManager
 public:
     explicit CurlManager(const std::string& downloadDirectoryPath);
 
-    DownloadReport downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes);
+    DownloadReport downloadMultiplexing(const std::set<CurrencyCode>& currenciesCodes,
+                                        const std::function<void(size_t completed, size_t total)>& onProgress);
 
 private:
     void setupDownload(const CurlMultiHandle& curlMultiHandle, const std::set<CurrencyCode>& currenciesCodes);
-    void startBatchDownload(CURLM* multiHandle);
+    void startBatchDownload(CURLM* multiHandle, const std::function<void(size_t completed, size_t total)>& onProgress);
 
     void handleResponseCodes(const std::map<CurrencyCode, CurlEasyHandle>& currencyCodesToHandlesMapping);
 
@@ -36,6 +37,5 @@ private:
 
     DownloadReport downloadReport_;
 
-    bool verbose_{};
     bool logFileSize_{};
 };

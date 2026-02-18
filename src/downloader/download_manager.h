@@ -1,8 +1,8 @@
 #pragma once
 
 #include <set>
-#include <map>
 #include <stdexcept>
+#include <functional>
 
 class CurrencyCode;
 class DownloadReport;
@@ -25,7 +25,9 @@ public:
     DownloadManager& operator=(DownloadManager&&) = delete;
     ~DownloadManager();
 
-    DownloadReport downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath, const std::set<CurrencyCode>& currenciesCodes);
+    DownloadReport downloadCurrenciesExchangeRatesFiles(const std::string& downloadDirectoryPath,
+                                                        const std::set<CurrencyCode>& currenciesCodes,
+                                                        const std::function<void(size_t completed, size_t total)>& onProgress);
 
 private:
     inline static bool alreadyCreated_{};

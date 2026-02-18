@@ -1,37 +1,40 @@
-[![Tests pipeline](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/tests-pipeline.yml/badge.svg)](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/tests-pipeline.yml)
+[![Tests](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/tests-workflow.yml/badge.svg)](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/tests-workflow.yml)
+
+[![Daily Live Download Test](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/daily-live-download-workflow.yml/badge.svg)](https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/actions/workflows/daily-live-download-workflow.yml)
 
 # Currency converter server
 
 This repository contains the server part of my currency converter, written in C++20.
 
-**Linux executable scripts are provided.**
+**Windows executable is provided.**
 
 ![](screenshot.png)
 
 Source code for the client is available in:
 
-https://github.com/adam-choragwicki/CurrencyConverter_Client_JavaSwing
+https://github.com/adam-choragwicki/CurrencyConverter_Client_Qt_Cplusplus
 
 # How it works
 
-Client sends requests to server using **Java sockets API**. Server sends responses to the requests using
-**C++ sockets API**.
+Client communicates with the server via a small REST API over HTTP.
 
-The converter supports about 150 currencies used around the world. Their list can be found in **data/currencies_list.json** file.
+The server exposes endpoints like `/status`, `/config`, `/calculate`, `/update`, and `/update/progress`.
+
+The converter supports about 150 currencies used around the world. Their list can be found in the **data/currencies_names_and_codes.json** file.
 
 # Exchange rates
 
-Immediately after start, the program uses cached exchange rates downloaded from www.floatrates.com, but the exchange rates can be updated by
-clicking "Update cache" button on client GUI. With good internet connection this process takes about 10 seconds. Please note that after updating,
-exchange rates for some less popular currencies are not available, because for some reason they are not always listed on www.floatrates.com.
+Immediately after starting, the program uses cached exchange rates downloaded from www.floatrates.com, but the exchange rates can be updated by
+clicking the "Update cache" button on the client GUI. With a good internet connection this process takes about 10 seconds. Please note that after updating,
+exchange rates for some less popular currencies are not available because for some reason they are not always listed on www.floatrates.com.
 
 # Components
 
 The currency converter consists of server and client.
 
-**Server** (C++), run as Linux executable
+**Server** (C++), run as a desktop executable
 
-**Client** (Java Swing), run directly using JAR file
+**Client** (Qt C++), run as a desktop executable
 
 # Tests
 
@@ -40,25 +43,18 @@ The currency converter consists of server and client.
 
 # 3rd party libraries
 
-**Curl** https://github.com/curl/curl
+- **Curl** https://github.com/curl/curl
 
-**RapidJSON** https://github.com/Tencent/rapidjson
+- **RapidJSON** https://github.com/Tencent/rapidjson
 
-**spdlog** https://github.com/gabime/spdlog
+- **spdlog** https://github.com/gabime/spdlog
 
-# Prerequisites
+# How to run on Windows
 
-* Java RE (minimum version 8)
-
-# How to run (Linux only)
-1. Clone repository and run **start_currency_converter.sh**
-
-**OR**
-
-1. Download server release zip from:\
-   https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/releases/latest/download/executable_linux.zip
-2. Download client release zip from:\
-   https://github.com/adam-choragwicki/CurrencyConverter_Client_JavaSwing/releases/latest/download/release.zip
-3. Unzip both archives
-4. Run **executable_linux/start_currency_converter_server.sh**
-5. Run **release/start_currency_converter_client.sh**
+1. Download server release zip:  
+   https://github.com/adam-choragwicki/CurrencyConverter_Server_Cplusplus/releases/latest/download/CurrencyConverterServer.zip
+2. Download client release zip:  
+   https://github.com/adam-choragwicki/CurrencyConverter_Client_Qt_Cplusplus/releases/latest/download/CurrencyConverterClient.zip
+3. Unzip both archives (e.g., into `C:\CurrencyConverter\Server` and `C:\CurrencyConverter\Client`).
+4. Start the server by running `CurrencyConverterServer.exe` from the **server** folder (do not move it; it needs its local `data/` and `connection.json`).
+5. Start the client by running `CurrencyConverterClient.exe` from the **client** folder.

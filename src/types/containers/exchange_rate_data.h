@@ -9,22 +9,9 @@ public:
     ExchangeRateData(const ExchangeRate& exchangeRate, const Timestamp& timestamp) : exchangeRate_(exchangeRate), timestamp_(timestamp)
     {}
 
-    [[nodiscard]] const ExchangeRate& getExchangeRate() const
-    { return exchangeRate_; }
+    [[nodiscard]] const ExchangeRate& getExchangeRate() const { return exchangeRate_; }
 
-    [[nodiscard]] const Timestamp& getTimestamp() const
-    { return timestamp_; }
-
-    void setNull()
-    {
-        exchangeRate_ = ExchangeRate("NULL");
-        timestamp_ = Timestamp("NULL");
-    }
-
-    [[nodiscard]] bool isNull() const
-    {
-        return exchangeRate_.toString() == "NULL" || timestamp_.toString() == "NULL";
-    }
+    [[nodiscard]] const Timestamp& getTimestamp() const { return timestamp_; }
 
 private:
     ExchangeRate exchangeRate_;

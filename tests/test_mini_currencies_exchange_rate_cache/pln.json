@@ -1,0 +1,20 @@
+{
+  "eur": {
+    "code": "EUR",
+    "alphaCode": "EUR",
+    "numericCode": "978",
+    "name": "Euro",
+    "rate": 4.0,
+    "date": "NEW",
+    "inverseRate": 0.25
+  },
+  "usd": {
+    "code": "USD",
+    "alphaCode": "USD",
+    "numericCode": "840",
+    "name": "U.S. Dollar",
+    "rate": 8.0,
+    "date": "NEW",
+    "inverseRate": 0.125
+  }
+}

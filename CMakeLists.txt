@@ -1,51 +1,27 @@
-cmake_minimum_required(VERSION 3.10)
-project(CurrencyConverter_Server LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.16)
+
+project(CurrencyConverterServer LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+enable_testing()
 
-set(DATA_FILES_DIR ${PROJECT_ROOT}/data)
-set(LOGGING_LIB_SRC_DIR ${PROJECT_ROOT}/libs/spdlog/include)
-set(JSON_LIB_SRC_DIR ${PROJECT_ROOT}/libs/json)
+add_library(project_includes INTERFACE)
+target_include_directories(project_includes INTERFACE ${PROJECT_SOURCE_DIR}/src)
 
-# All modules have access to logging library headers
-include_directories(${LOGGING_LIB_SRC_DIR})
+add_library(third_party_rapidjson INTERFACE)
+target_include_directories(third_party_rapidjson INTERFACE ${PROJECT_SOURCE_DIR}/libs/json)
+add_library(third_party::rapidjson ALIAS third_party_rapidjson)
 
-# Custom target to copy config.json to bin directory
-add_custom_target(copy_config_json
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/config.json ${PROJECT_ROOT}/bin/config.json
-        DEPENDS ${CMAKE_SOURCE_DIR}/config.json)
+add_library(third_party_httplib INTERFACE)
+target_include_directories(third_party_httplib INTERFACE ${PROJECT_SOURCE_DIR}/libs/cpp-httplib)
+add_library(third_party::httplib ALIAS third_party_httplib)
 
-# Custom target to copy data directory to bin directory
-add_custom_target(copy_data_directory
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${DATA_FILES_DIR} ${PROJECT_ROOT}/bin/data
-        DEPENDS ${DATA_FILES_DIR})
-
-# Function to copy data directory and config.json to the specified output directory
-function(target_copy_program_data_to_binaries_directory TARGET_NAME)
-    # Copy data directory
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${DATA_FILES_DIR} ${PROJECT_ROOT}/bin/data)
-
-    # Copy config.json file
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/config.json ${PROJECT_ROOT}/bin/config.json)
-
-    # Add dependencies on copy_config_json and copy_data_directory
-    add_dependencies(${TARGET_NAME} copy_config_json copy_data_directory)
-endfunction()
-
-# Enable ccache if available
-find_program(CCACHE_PROGRAM ccache)
-if (CCACHE_PROGRAM)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PROGRAM})
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE_PROGRAM})
-endif ()
+add_library(third_party_spdlog INTERFACE)
+target_include_directories(third_party_spdlog INTERFACE ${PROJECT_SOURCE_DIR}/libs/spdlog/include)
+add_library(third_party::spdlog ALIAS third_party_spdlog)
 
 add_subdirectory(src)
 add_subdirectory(tests/unit_tests)

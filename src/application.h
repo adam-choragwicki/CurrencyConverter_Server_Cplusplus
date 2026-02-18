@@ -1,40 +1,37 @@
 #pragma once
 
-#include "socket_communication/connection_manager.h"
-#include "message_processing/inbound_message_queue.h"
+#include "config_data.h"
+#include "connection_data.h"
 #include "currencies_exchange_rate_databank/currencies_exchange_rate_databank.h"
-#include "config/config.h"
-#include "downloader/download_manager.h"
-#include "types/currencies_list_file_content.h"
-#include <atomic>
+#include "types/currencies_names_and_codes_file_content.h"
+#include <memory>
+
+class DownloadManager;
+class RequestProcessingService;
+class StatusRequestHandler;
+class GetConfigRequestHandler;
+class CalculateExchangeRequestHandler;
+class UpdateCacheRequestHandler;
+class UpdateCacheProgressRequestHandler;
 
 class Application
 {
 public:
-    explicit Application(const Config& config);
+    Application();
+    ~Application();
 
 private:
-    void runApplication();
+    ConfigData loadConfigData();
+    ConnectionData loadConnectionData();
+    CurrenciesNamesAndCodesFileContent loadCurrenciesNamesAndCodesFileContent();
 
-    void startInteractiveInputModeThread(std::atomic_bool& closeApplicationCommandReceived);
-    void interactiveInputModeThread(std::atomic_bool& closeApplicationCommandReceived);
-
-    void startClientMessageConsumingThread(ClientSocketHandler& clientSocketHandler);
-    void clientMessageConsumingThread(ClientSocketHandler& clientSocketHandler);
-
-    void startInboundMessageProcessingThread();
-    [[noreturn]] void inboundMessageProcessingThread();
-
-    void startWaitForConnectionAndAcceptThread();
-    [[noreturn]] void waitForConnectionAndAcceptThread();
-
-    const Config config_;
-    std::unique_ptr<ConnectionManager> connectionManager_;
     std::unique_ptr<CurrenciesExchangeRatesDatabank> currenciesExchangeRatesDatabank_;
+
     std::unique_ptr<DownloadManager> downloadManager_;
-    std::unique_ptr<InboundMessageQueue> inboundMessageQueue_;
-
-    std::mutex messageQueueMutex_;
-
-    CurrenciesListFileContent currenciesListFileContent_;
+    std::unique_ptr<RequestProcessingService> requestProcessingService_;
+    std::unique_ptr<StatusRequestHandler> statusRequestHandler_;
+    std::unique_ptr<GetConfigRequestHandler> getConfigRequestHandler_;
+    std::unique_ptr<CalculateExchangeRequestHandler> calculateExchangeRequestHandler_;
+    std::unique_ptr<UpdateCacheRequestHandler> updateCacheRequestHandler_;
+    std::unique_ptr<UpdateCacheProgressRequestHandler> updateCacheProgressRequestHandler_;
 };

@@ -9,6 +9,7 @@ class JsonWriter
 public:
     JsonWriter();
     [[nodiscard]] std::string writeJsonDOMToString() const;
+    void addRawJsonObjectValue(const std::string& key, const std::string& rawJson);
     void addKeyValuePair(const std::string& key, const std::string& value);
     [[nodiscard]] std::string toJsonString() const;
 

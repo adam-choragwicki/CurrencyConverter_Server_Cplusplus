@@ -7,29 +7,71 @@
 #include "json_processing/exceptions.h"
 #include "spdlog/spdlog.h"
 #include "types/definitions.h"
-#include "types/currencies_list_file_content.h"
+#include "types/currencies_names_and_codes_file_content.h"
 
-std::set<CurrencyCode> JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(const CurrenciesListFileContent& currenciesListFileContent)
+ConfigData JsonParser::parseConfigData(const std::string& configFileContent)
 {
-    //TODO implement expected schema
-    JsonReader jsonReader(currenciesListFileContent.toString());
+    const JsonReader jsonReader(configFileContent);
+
+    const std::string initialSourceCurrencyCode = jsonReader.getStringValue("initial_source_currency");
+    const std::string initialTargetCurrencyCode = jsonReader.getStringValue("initial_target_currency");
+
+    // spdlog::debug(
+    //     "Config data:\n"
+    //     "\t\t\t\t\tinitial_source_currency: {}\n"
+    //     "\t\t\t\t\tinitial_target_currency: {}\n",
+    //     initialSourceCurrencyCode,
+    //     initialTargetCurrencyCode);
+
+    return {initialSourceCurrencyCode, initialTargetCurrencyCode};
+}
+
+ConnectionData JsonParser::parseConnectionData(const std::string& configFileContent)
+{
+    const JsonReader jsonReader(configFileContent);
+
+    const std::string host = jsonReader.getStringValue("host");
+    const std::string portStr = jsonReader.getNumericValueAsString("port");
+
+    int port = 0;
+    try
+    {
+        port = std::stoi(portStr);
+    }
+    catch (const std::exception&)
+    {
+        throw JsonParseError("Invalid port value: " + portStr);
+    }
+
+    if (port <= 0 || port > 65535)
+    {
+        throw JsonParseError("Port out of range: " + portStr);
+    }
+
+    return {host, port};
+}
+
+std::set<CurrencyCode> JsonParser::parseCurrenciesNamesAndCodesFileToCurrenciesCodes(const CurrenciesNamesAndCodesFileContent& currenciesNamesAndCodesFileContent)
+{
+    const JsonReader jsonReader(currenciesNamesAndCodesFileContent.toString());
 
     auto keyValuePairs = jsonReader.getKeyValuePairs();
 
-    if(keyValuePairs.empty())
+    if (keyValuePairs.empty())
     {
         throw JsonParseError("Could not parse any currencies codes-names key-value pairs");
     }
 
     std::set<CurrencyCode> currenciesCodes;
 
-    for(const auto&[key, value] : keyValuePairs)
+    for (const auto& [key, value]: keyValuePairs)
     {
-        if(key.empty())
+        if (key.empty())
         {
             throw JsonParseError("Key is empty");
         }
-        else if(value.empty())
+
+        if (value.empty())
         {
             throw JsonParseError("Value for '" + key + "' is empty");
         }
@@ -45,53 +87,91 @@ ParseResult JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRat
                                                                                              const CurrencyExchangeRatesJson& currencyExchangeRatesJson,
                                                                                              bool allKeysExistenceRequired)
 {
-    JsonReader jsonReader(currencyExchangeRatesJson.toString());
+    const JsonReader jsonReader(currencyExchangeRatesJson.toString());
 
     CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap;
 
-    for(const CurrencyCode& currencyCode : currenciesCodes)
+    for (const CurrencyCode& currencyCode: currenciesCodes)
     {
-        if(currencyCode == sourceCurrencyCode)
+        if (currencyCode == sourceCurrencyCode)
         {
             /*Skip source currency as it is obviously not present in the JSON */
             continue;
         }
-        else
+
+        if (jsonReader.hasKey(currencyCode.toString()))
         {
-            //TODO if everything is first time loaded and mandatory present
-
-            if(jsonReader.hasKey(currencyCode.toString()))
+            try
             {
-                try
-                {
-                    const ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
-                    const Timestamp timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
+                const ExchangeRate exchangeRate(jsonReader.getNumericValueAsString(currencyCode.toString(), "rate"));
+                const Timestamp timestamp(jsonReader.getStringValue(currencyCode.toString(), "date"));
 
-                    ExchangeRateData exchangeRateData(exchangeRate, timestamp);
+                ExchangeRateData exchangeRateData(exchangeRate, timestamp);
 
-                    currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, exchangeRateData);
-                }
-                catch(const JsonMissingKeyError& jsonMissingKeyError)
+                currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, exchangeRateData);
+            }
+            catch (const JsonMissingKeyError& jsonMissingKeyError)
+            {
+                spdlog::warn(jsonMissingKeyError.what());
+
+                if (allKeysExistenceRequired)
                 {
-                    if(allKeysExistenceRequired)
-                    {
-                        spdlog::critical(jsonMissingKeyError.what());
-                        exit(1);
-                    }
-                    else
-                    {
-                        spdlog::warn(jsonMissingKeyError.what());
-                        currencyCodeToExchangeRateDataMap.insert_or_assign(currencyCode, ExchangeRateData(ExchangeRate("NULL"), Timestamp("NULL")));
-                    }
+                    return ParseResult{false, std::nullopt};
                 }
             }
-            else
+        }
+        else
+        {
+            if (allKeysExistenceRequired)
             {
                 spdlog::error("Error, currency '{}' is not present in JSON", currencyCode.toString());
                 return ParseResult(false, std::nullopt);
             }
+
+            spdlog::warn("Currency '{}' is not present in JSON; skipping", currencyCode.toString());
         }
     }
 
     return ParseResult{true, currencyCodeToExchangeRateDataMap};
+}
+
+std::map<std::string, std::string> JsonParser::parseCurrenciesNamesAndCodesFileToMap(const CurrenciesNamesAndCodesFileContent& currenciesNamesAndCodesFileContent)
+{
+    // Expected schema:
+    // {
+    //   "U.S. Dollar": "USD",
+    //   "Euro": "EUR",
+    //   ...
+    // }
+
+    const JsonReader jsonReader(currenciesNamesAndCodesFileContent.toString());
+    const auto keyValuePairs = jsonReader.getKeyValuePairs();
+
+    if (keyValuePairs.empty())
+    {
+        throw JsonParseError("Could not parse any currencies names-codes key-value pairs");
+    }
+
+    std::map<std::string, std::string> currenciesNamesAndCodes;
+
+    for (const auto& [currencyName, currencyCode]: keyValuePairs)
+    {
+        if (currencyName.empty())
+        {
+            throw JsonParseError("Currency name key is empty");
+        }
+
+        if (currencyCode.empty())
+        {
+            throw JsonParseError("Currency code for '" + currencyName + "' is empty");
+        }
+
+        const auto [_, inserted] = currenciesNamesAndCodes.emplace(currencyName, currencyCode);
+        if (!inserted)
+        {
+            throw JsonParseError("Duplicate currency name key: '" + currencyName + "'");
+        }
+    }
+
+    return currenciesNamesAndCodes;
 }

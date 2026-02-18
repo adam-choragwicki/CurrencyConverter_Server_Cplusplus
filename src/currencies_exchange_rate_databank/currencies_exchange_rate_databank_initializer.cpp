@@ -1,19 +1,46 @@
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
-#include "config/config.h"
 #include "json_processing/json_parser.h"
 #include "types/currency_code.h"
 #include "currencies_exchange_rate_databank.h"
-#include "utilities.h"
+#include "utilities/utilities.h"
+#include <stdexcept>
+#include <vector>
 
 void CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::string& directoryPath)
 {
     const std::set<CurrencyCode>& allCurrenciesCodes = currenciesExchangeRatesDatabank.getCurrenciesCodes();
 
-    spdlog::info("Loading exchange rates data for {} currencies", allCurrenciesCodes.size());
+    const std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
+    std::vector<std::string> missingCurrencyCodes;
 
-    std::map<CurrencyCode, std::string> currencyCodeToFilePathMapping = Utilities::getCurrencyCodeToFilePathMapping(directoryPath, allCurrenciesCodes);
-    std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping);
+    for (const CurrencyCode& currencyCode: allCurrenciesCodes)
+    {
+        if (!currencyCodeToFilePathMapping.contains(currencyCode))
+        {
+            missingCurrencyCodes.push_back(currencyCode.toString());
+        }
+    }
+
+    if (!missingCurrencyCodes.empty())
+    {
+        std::string message = "Missing cache files for currencies: ";
+
+        for (size_t i = 0; i < missingCurrencyCodes.size(); ++i)
+        {
+            if (i > 0)
+            {
+                message += ", ";
+            }
+
+            message += missingCurrencyCodes[i];
+        }
+
+        spdlog::critical(message);
+        throw std::runtime_error(message);
+    }
+
+    const std::map<CurrencyCode, ParseResult> currencyCodeToParseResultMapping = Utilities::parseFiles(allCurrenciesCodes, currencyCodeToFilePathMapping, true);
 
     initializeCurrenciesExchangeRatesDatabank(currenciesExchangeRatesDatabank, currencyCodeToParseResultMapping);
 
@@ -22,49 +49,15 @@ void CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCach
 
 void CurrenciesExchangeRatesDatabankInitializer::initializeCurrenciesExchangeRatesDatabank(CurrenciesExchangeRatesDatabank& currenciesExchangeRatesDatabank, const std::map<CurrencyCode, ParseResult>& currencyCodeToParseResultMapping)
 {
-    for(const auto&[currencyCode, parseResult] : currencyCodeToParseResultMapping)
+    for (const auto& [currencyCode, parseResult]: currencyCodeToParseResultMapping)
     {
-        if(parseResult.isSuccess_)
+        if (!parseResult.isSuccess_ || !parseResult.currencyCodeToCurrencyExchangeRateDataMapping_)
         {
-            currenciesExchangeRatesDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
+            const std::string message = "Failed to parse exchange rates cache file for currency '" + currencyCode.toString() + "'";
+            spdlog::critical(message);
+            throw std::runtime_error(message);
         }
+
+        currenciesExchangeRatesDatabank.insertAllExchangeRatesDataForCurrency(currencyCode, *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_);
     }
 }
-
-//    for(const CurrencyCode& currencyCode : currenciesCodes)
-//    {
-//        const std::string filePath = directoryPath + currencyCode.toString() + ".json";
-
-//        if(FilesHelper::fileExists(filePath))
-//        {
-//            const CurrencyExchangeRatesJson currencyExchangeRatesJson = CurrencyExchangeRatesJson(FilesHelper::loadFileContent(filePath));
-//
-//            if(JsonValidator::isValidJsonString(currencyExchangeRatesJson.toString()))
-//            {
-//                ParseResult parseResult = JsonParser::parseExchangeRatesJsonStringToCurrencyCodesToExchangeRateDataMapping(currencyCode, currenciesCodes_, currencyExchangeRatesJson, true);
-//                const CurrencyCodeToCurrencyExchangeRateDataMapping currencyCodeToExchangeRateDataMap = *parseResult.currencyCodeToCurrencyExchangeRateDataMapping_;
-//
-//                for(const auto&[currencyCode2, exchangeRateData] : currencyCodeToExchangeRateDataMap)
-//                {
-//                    if(!exchangeRateData.isNull())
-//                    {
-//                        currenciesExchangeRatesCache_.insert_or_assign(currencyCode, currencyCodeToExchangeRateDataMap);
-//                    }
-//                    else
-//                    {
-//                        spdlog::error("Wrong new exchange rate data, previous exchange rate will be kept for consistency");
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' is not a valid JSON string");
-//                exit(1);
-//            }
-//        }
-//        else
-//        {
-//            spdlog::critical("Error while loading currencies exchange rates cache.\n File '" + filePath + "' does not exist");
-//            exit(1);
-//        }
-//    }

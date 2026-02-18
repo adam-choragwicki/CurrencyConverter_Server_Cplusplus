@@ -1,21 +1,28 @@
-set(SOURCE_FILES
-        main.cpp
-        application.cpp application.h)
-
-add_subdirectory(config)
 add_subdirectory(types)
 add_subdirectory(json_processing)
-add_subdirectory(downloader)
 add_subdirectory(messages)
+add_subdirectory(downloader)
 add_subdirectory(message_processing)
 add_subdirectory(currencies_exchange_rate_databank)
-add_subdirectory(converter)
-add_subdirectory(socket_communication)
+add_subdirectory(exchange_calculator)
 add_subdirectory(utilities)
+add_subdirectory(services)
+add_subdirectory(http)
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} config socket_communication message_processing messages types currencies_exchange_rate_databank converter)
+add_executable(CurrencyConverterServer
+        main.cpp
+        application.cpp application.h
+        log_manager.h)
 
-target_copy_program_data_to_binaries_directory(${PROJECT_NAME})
+target_link_libraries(CurrencyConverterServer
+        PRIVATE
+        project_includes
+        third_party::spdlog
+        http_server
+        request_processing_service
+        json_processing
+        utilities
+        downloader
+        currencies_exchange_rate_databank)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT}/bin)
+set_target_properties(CurrencyConverterServer PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

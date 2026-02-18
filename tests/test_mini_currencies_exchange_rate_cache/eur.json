@@ -1,0 +1,20 @@
+{
+  "pln": {
+    "code": "PLN",
+    "alphaCode": "PLN",
+    "numericCode": "985",
+    "name": "Polish Zloty",
+    "rate": 1.0,
+    "date": "NEW",
+    "inverseRate": 1.0
+  },
+  "usd": {
+    "code": "USD",
+    "alphaCode": "USD",
+    "numericCode": "840",
+    "name": "U.S. Dollar",
+    "rate": 2.0,
+    "date": "NEW",
+    "inverseRate": 0.5
+  }
+}

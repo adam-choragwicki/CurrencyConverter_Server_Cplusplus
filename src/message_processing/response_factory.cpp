@@ -1,51 +1,79 @@
 #include "response_factory.h"
+#include "json_processing/json_writer.h"
 #include "messages/message_contract.h"
 
-GetConfigResponse ResponseFactory::makeGetConfigResponse(const std::string& currenciesNamesAndCodes, const CorrelationId& correlationId)
+std::string ResponseFactory::makeStatusJson(const StatusResponseDto& dto)
+{
+    JsonWriter jsonWriter;
+    jsonWriter.addKeyValuePair("message", "status response from server");
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::StatusResponseContract::STATUS, dto.status);
+    return jsonWriter.toJsonString();
+}
+
+std::string ResponseFactory::makeGetConfigJson(const GetConfigResponseDto& dto)
 {
     JsonWriter jsonWriter;
 
-    assignResponseType(jsonWriter, MessageContract::MessageType::ResponseType::GET_CONFIG_RESPONSE);
-    assignCorrelationId(jsonWriter, correlationId);
+    // scalar fields
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::GetConfigResponseContract::INITIAL_SOURCE_CURRENCY, dto.initialSourceCurrencyCode);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::GetConfigResponseContract::INITIAL_TARGET_CURRENCY, dto.initialTargetCurrencyCode);
 
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::GetConfigResponseContract::CURRENCIES_NAMES_AND_CODES, currenciesNamesAndCodes);
+    // currencies_names_and_codes object
+    JsonWriter currenciesObjectWriter;
+    for (const auto& [name, code]: dto.currenciesNamesAndCodes)
+    {
+        currenciesObjectWriter.addKeyValuePair(name, code);
+    }
 
-    return {MessageContract::MessageType::ResponseType::GET_CONFIG_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
+    jsonWriter.addRawJsonObjectValue(MessageContract::MessagePayload::GetConfigResponseContract::CURRENCIES_NAMES_AND_CODES, currenciesObjectWriter.toJsonString());
+
+    return jsonWriter.toJsonString();
 }
 
-CalculateExchangeResponse ResponseFactory::makeCalculateExchangeResponse(const std::string& status, const std::string& calculationResult, const Timestamp& exchangeRateTimestamp, const std::string& failureReason, const CorrelationId& correlationId)
+std::string ResponseFactory::makeCalculateExchangeJson(const CalculateExchangeResponseDto& dto)
 {
     JsonWriter jsonWriter;
 
-    assignResponseType(jsonWriter, MessageContract::MessageType::ResponseType::CALCULATE_EXCHANGE_RESPONSE);
-    assignCorrelationId(jsonWriter, correlationId);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::StatusResponseContract::STATUS, dto.status);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::SOURCE_CURRENCY, dto.sourceCurrencyCode);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::TARGET_CURRENCY, dto.targetCurrencyCode);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::SOURCE_CURRENCY_AMOUNT, dto.sourceCurrencyAmount);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::EXCHANGE_RATE, dto.exchangeRate);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::EXCHANGE_RESULT, dto.exchangeResult);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::CalculateExchangeResponseContract::EXCHANGE_RATE_TIMESTAMP, dto.exchangeRateTimestamp);
 
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::STATUS, status);
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::CALCULATION_RESULT, calculationResult);
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::EXCHANGE_RATE_TIMESTAMP, exchangeRateTimestamp.toString());
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::CalculateExchangeResponseContract::FAILURE_REASON, failureReason);
-
-    return {MessageContract::MessageType::ResponseType::CALCULATE_EXCHANGE_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
+    return jsonWriter.toJsonString();
 }
 
-UpdateCacheResponse ResponseFactory::makeUpdateCacheResponse(const std::string& status, const CorrelationId& correlationId)
+std::string ResponseFactory::makeUpdateCacheJson(const UpdateCacheResponseDto& dto)
 {
     JsonWriter jsonWriter;
 
-    assignResponseType(jsonWriter, MessageContract::MessageType::ResponseType::UPDATE_CACHE_RESPONSE);
-    assignCorrelationId(jsonWriter, correlationId);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::UpdateCacheResponseContract::STATUS, dto.status);
 
-    jsonWriter.addKeyValuePair(MessageContract::MessageContent::UpdateCacheResponseContract::STATUS, status);
-
-    return {MessageContract::MessageType::ResponseType::UPDATE_CACHE_RESPONSE, MessageBody(jsonWriter.toJsonString()), correlationId};
+    return jsonWriter.toJsonString();
 }
 
-void ResponseFactory::assignResponseType(JsonWriter& jsonWriter, const std::string& type)
+std::string ResponseFactory::makeUpdateCacheProgressJson(const UpdateCacheProgressResponseDto& dto)
 {
-    jsonWriter.addKeyValuePair(MessageContract::TYPE, type);
+    JsonWriter jsonWriter;
+
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::UpdateCacheProgressResponseContract::STATUS, dto.status);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::UpdateCacheProgressResponseContract::COMPLETED, dto.completed);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::UpdateCacheProgressResponseContract::TOTAL, dto.total);
+
+    if (!dto.error.empty())
+    {
+        jsonWriter.addKeyValuePair(MessageContract::MessagePayload::ErrorResponseContract::ERROR_MESSAGE, dto.error);
+    }
+
+    return jsonWriter.toJsonString();
 }
 
-void ResponseFactory::assignCorrelationId(JsonWriter& jsonWriter, const CorrelationId& correlationId)
+std::string ResponseFactory::makeErrorJson(const ErrorResponseDto& dto)
 {
-    jsonWriter.addKeyValuePair(MessageContract::CORRELATION_ID, correlationId.toString());
+    JsonWriter jsonWriter;
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::ErrorResponseContract::ERROR_MESSAGE, dto.error);
+    jsonWriter.addKeyValuePair(MessageContract::MessagePayload::ErrorResponseContract::ERROR_CODE, dto.errorCode);
+    return jsonWriter.toJsonString();
 }

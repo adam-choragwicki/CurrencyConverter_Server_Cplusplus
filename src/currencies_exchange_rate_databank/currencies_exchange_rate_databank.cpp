@@ -2,57 +2,59 @@
 #include "json_processing/json_parser.h"
 #include "types/currency_code.h"
 #include "json_processing/exceptions.h"
-#include "config/config.h"
+#include "paths.h"
 #include "currencies_exchange_rate_databank_initializer.h"
 #include "spdlog/spdlog.h"
 
-CurrenciesExchangeRatesDatabank::CurrenciesExchangeRatesDatabank(const CurrenciesListFileContent& currenciesListFileContent)
+CurrenciesExchangeRatesDatabank::CurrenciesExchangeRatesDatabank(const CurrenciesNamesAndCodesFileContent& currenciesNamesAndCodesFileContent)
 {
-    if(!alreadyCreated_)
+    try
     {
-        try
-        {
-            currenciesCodes_ = JsonParser::parseCurrenciesListFileContentToCurrenciesCodes(currenciesListFileContent);
+        currenciesCodes_ = JsonParser::parseCurrenciesNamesAndCodesFileToCurrenciesCodes(currenciesNamesAndCodesFileContent);
 
-            //initializeCache
-            CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CurrenciesExchangeRatesDatabankConfig::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
-        }
-        catch(JsonParseError& jsonParseError)
-        {
-            spdlog::critical("Error while processing currencies list file content, {}", jsonParseError.what());
-            exit(1);
-        }
-
-        alreadyCreated_ = true;
+        //initializeCache
+        CurrenciesExchangeRatesDatabankInitializer::loadCurrenciesExchangeRatesCacheFromFiles(*this, Paths::CURRENCIES_EXCHANGE_RATE_CACHE_DIRECTORY_PATH);
     }
-    else
+    catch (JsonParseError& jsonParseError)
     {
-        throw std::runtime_error("Error, trying to construct another instance of CurrenciesExchangeRatesDatabank");
+        throw std::runtime_error(std::format("Error while parsing currencies list file content: {}", jsonParseError.what()));
+    }
+}
+
+std::optional<ExchangeRateData> CurrenciesExchangeRatesDatabank::tryGetExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
+{
+    // combine lookup with retrieval under a single lock to avoid TOCTOU
+    std::shared_lock lock(cacheMutex_);
+
+    if (sourceCurrencyCode == targetCurrencyCode)
+    {
+        return std::nullopt;
     }
 
-    spdlog::debug("Currencies exchange rate databank initialized");
-}
+    const auto sourceIt = currenciesExchangeRatesCache_.find(sourceCurrencyCode);
 
-CurrenciesExchangeRatesDatabank::~CurrenciesExchangeRatesDatabank()
-{
-    alreadyCreated_ = false;
-}
+    if (sourceIt == currenciesExchangeRatesCache_.end())
+    {
+        return std::nullopt;
+    }
 
-bool CurrenciesExchangeRatesDatabank::containsExchangeRateData(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
-{
-    return currenciesExchangeRatesCache_.contains(sourceCurrencyCode) && currenciesExchangeRatesCache_.at(sourceCurrencyCode).contains(targetCurrencyCode);
-}
+    const auto targetIt = sourceIt->second.find(targetCurrencyCode);
 
-ExchangeRateData CurrenciesExchangeRatesDatabank::getExchangeRateDataForCurrenciesPair(const CurrencyCode& sourceCurrencyCode, const CurrencyCode& targetCurrencyCode) const
-{
-    return currenciesExchangeRatesCache_.at(sourceCurrencyCode).at(targetCurrencyCode);
+    if (targetIt == sourceIt->second.end())
+    {
+        return std::nullopt;
+    }
+
+    return targetIt->second;
 }
 
 void CurrenciesExchangeRatesDatabank::insertAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
-    const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
+    std::unique_lock lock(cacheMutex_);
 
-    if(!inserted)
+    auto [_, inserted] = currenciesExchangeRatesCache_.try_emplace(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
+
+    if (!inserted)
     {
         throw std::runtime_error("Error, exchange rate data for currency '" + sourceCurrency.toString() + "' already exists");
     }
@@ -60,10 +62,32 @@ void CurrenciesExchangeRatesDatabank::insertAllExchangeRatesDataForCurrency(cons
 
 void CurrenciesExchangeRatesDatabank::reassignAllExchangeRatesDataForCurrency(const CurrencyCode& sourceCurrency, const CurrencyCodeToCurrencyExchangeRateDataMapping& currencyCodeToCurrencyExchangeRateDataMapping)
 {
-    const auto&[_, inserted] = currenciesExchangeRatesCache_.insert_or_assign(sourceCurrency, currencyCodeToCurrencyExchangeRateDataMapping);
+    std::unique_lock lock(cacheMutex_);
 
-    if(inserted)
+    auto it = currenciesExchangeRatesCache_.find(sourceCurrency);
+
+    if (it == currenciesExchangeRatesCache_.end())
     {
         throw std::runtime_error("Error, exchange rate data for currency '" + sourceCurrency.toString() + "' does not exist");
     }
+
+    it->second = currencyCodeToCurrencyExchangeRateDataMapping;
+}
+
+CurrenciesExchangeRatesDatabank::ExchangeRatesCache CurrenciesExchangeRatesDatabank::snapshotExchangeRatesCache() const
+{
+    std::shared_lock lock(cacheMutex_);
+    return currenciesExchangeRatesCache_;
+}
+
+void CurrenciesExchangeRatesDatabank::replaceExchangeRatesCache(ExchangeRatesCache newCache)
+{
+    std::unique_lock lock(cacheMutex_);
+    currenciesExchangeRatesCache_.swap(newCache);
+}
+
+size_t CurrenciesExchangeRatesDatabank::size() const
+{
+    std::shared_lock lock(cacheMutex_);
+    return currenciesExchangeRatesCache_.size();
 }
